@@ -1,1 +1,1 @@
-# lightsb-service
+# Сервис для проекта LightSB
