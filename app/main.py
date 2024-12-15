@@ -5,10 +5,8 @@ from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
-# Подключение папки со статическими файлами
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# Настройка шаблонов
 templates = Jinja2Templates(directory="app/templates")
 
 
