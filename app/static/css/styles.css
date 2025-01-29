@@ -26,34 +26,25 @@ body {
     width: 100%;
 }
 
-.Home, .Generator, .About-us {
+.Menu-item {
     width: 100%;
     height: 70px;
     display: flex;
     align-items: center;
     padding: 0 20px;
     box-sizing: border-box;
-}
-
-.Home {
-    background-color: #525252;
-}
-
-.Generator, .About-us {
     background-color: #3d3d3d;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.iconhome, .icongenerator, .iconaboutus {
+.Menu-item img {
     width: 50px;
     height: 50px;
-    flex-grow: 0;
     object-fit: contain;
 }
 
-.Home-txt, .Generator-txt, .About-us-txt {
-    width: auto;
-    height: auto;
-    flex-grow: 0;
+.Menu-item span {
     font-family: 'Numans', sans-serif;
     font-size: 1.875rem;
     font-weight: 400;
@@ -64,17 +55,25 @@ body {
     margin-left: 20px;
 }
 
+.Menu-item.active {
+    background-color: #525252;
+}
+
 .Profile {
     position: relative;
-    width: 100%;
     height: 119px;
-    display: flex;
-    flex-direction: row;
     justify-content: center;
-    align-items: center;
     gap: 20px;
-    background-color: #3d3d3d;
     margin-top: auto;
+}
+
+.Profile .iconprofile {
+    width: 70px;
+    height: 70px;
+}
+
+.Profile .Profile-txt {
+    font-size: 3rem;
 }
 
 .Line {
@@ -84,20 +83,4 @@ body {
     width: 100%;
     height: 2px;
     background-color: #989898;
-}
-
-.iconprofile {
-    width: 70px;
-    height: 70px;
-    object-fit: contain;
-}
-
-.Profile-txt {
-    font-family: 'Numans', sans-serif;
-    font-size: 3rem;
-    font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: 0.5px;
-    text-align: center;
-    color: #bdbdbd;
 }
