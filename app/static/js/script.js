@@ -23,11 +23,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     menuItems.forEach(item => {
         item.addEventListener('click', function () {
-            // Убираем активный класс у всех элементов меню
             menuItems.forEach(i => i.classList.remove('active'));
             this.classList.add('active');
 
-            // Получаем ключ страницы из класса элемента
             if (this.classList.contains("Home")) {
                 contentArea.innerHTML = pages.home;
             } else if (this.classList.contains("Generator")) {
