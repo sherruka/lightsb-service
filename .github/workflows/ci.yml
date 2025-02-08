@@ -1,0 +1,23 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build_and_run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get repository code
+        uses: actions/checkout@v4
+
+      - name: Build images
+        run: docker compose -f ./docker/docker-compose.minio.yaml --env-file ./env/.env.minio up --build -d
+
+      - name: Check running containers
+        run: docker ps -a
+
+      - name: Stop and remove containers
+        run: docker compose -f ./docker/docker-compose.minio.yaml --env-file ./env/.env.minio down
