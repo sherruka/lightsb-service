@@ -1,0 +1,10 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend/Dockerfile
+    container_name: backend
+    volumes:
+      - ../app:/app
+    ports:
+      - "8000:8000"
