@@ -13,6 +13,13 @@ jobs:
       - name: Get repository code
         uses: actions/checkout@v4
 
+      - name: Create .env.minio
+        run: |
+          echo "MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}" >> ./env/.env.minio
+          echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}" >> ./env/.env.minio
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ./env/.env.minio
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ./env/.env.minio
+
       - name: Build images
         run: docker compose -f ./docker/docker-compose.minio.yaml --env-file ./env/.env.minio up --build -d
 
