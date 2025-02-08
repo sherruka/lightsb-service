@@ -5,7 +5,7 @@ services:
       - '9000:9000'
       - '9001:9001'
     volumes:
-      - ./data/minio_db:/data
+      - ../data/minio_db:/data
     container_name: lightsb-service-minio-1
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
@@ -29,7 +29,7 @@ services:
       - -c
       - |
         mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}
-        mc ls myminio/mlflow 2>/dev/null || mc mb myminio/mlflow
+        mc ls myminio/lightsb-service 2>/dev/null || mc mb myminio/lightsb-service
     depends_on:
       minio:
         condition: service_healthy
