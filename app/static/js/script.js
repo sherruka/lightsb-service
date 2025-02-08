@@ -1,40 +1,36 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const menuItems = document.querySelectorAll('.Menu-item');
-    const contentArea = document.querySelector('.Content-area');
+document.addEventListener("DOMContentLoaded", async function () {
+    const menuItems = document.querySelectorAll(".Menu-item");
+    const contentArea = document.querySelector(".Content-area");
 
-    const pages = {
-        home: `
-            <span class="Main-text">Main information</span>
-            <span class="Second-text">Welcome to the LightSB service!</span>
-        `,
-        generator: `
-            <span class="Main-text">Generator</span>
-            <span class="Second-text">Create something unique with our generator.</span>
-        `,
-        aboutUs: `
-            <span class="Main-text">About Us</span>
-            <span class="Second-text">Learn more about our team and mission.</span>
-        `,
-        profile: `
-            <span class="Main-text">Profile</span>
-            <span class="Second-text">Manage your account and settings.</span>
-        `
-    };
+    async function loadPage(page) {
+        try {
+            const response = await fetch(`/pages/${page}`);
+            if (response.ok) {
+                const html = await response.text();
+                contentArea.innerHTML = html;
+            } else {
+                contentArea.innerHTML = "<h2>Page not found</h2>";
+            }
+        } catch (error) {
+            contentArea.innerHTML = "<h2>Error loading page</h2>";
+        }
+    }
+
+    await loadPage("home");
 
     menuItems.forEach(item => {
-        item.addEventListener('click', function () {
-            menuItems.forEach(i => i.classList.remove('active'));
-            this.classList.add('active');
+        if (item.dataset.page === "home") {
+            item.classList.add("active");
+        }
+    });
 
-            if (this.classList.contains("Home")) {
-                contentArea.innerHTML = pages.home;
-            } else if (this.classList.contains("Generator")) {
-                contentArea.innerHTML = pages.generator;
-            } else if (this.classList.contains("About-us")) {
-                contentArea.innerHTML = pages.aboutUs;
-            } else if (this.classList.contains("Profile")) {
-                contentArea.innerHTML = pages.profile;
-            }
+    menuItems.forEach(item => {
+        item.addEventListener("click", async function () {
+            menuItems.forEach(i => i.classList.remove("active"));
+            this.classList.add("active");
+
+            const page = this.dataset.page;
+            await loadPage(page);
         });
     });
 });
