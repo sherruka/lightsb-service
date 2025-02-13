@@ -96,6 +96,7 @@ body {
 }
 
 .Content-area {
+    width: 80%;
     flex-grow: 1;
     padding: 20px;
     background: #292929;
@@ -112,7 +113,7 @@ body {
     text-align: left;
     word-wrap: break-word;
     white-space: normal;
-    width: 100%;
+    width: 98%;
     box-sizing: border-box;
 }
 
@@ -137,7 +138,7 @@ body {
     box-sizing: border-box;
 }
 
-.GitHub {
+.Link {
     color: #14B8AE;
     text-decoration: none;
     transition: color 0.3s ease;
