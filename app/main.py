@@ -18,7 +18,7 @@ async def root(request: Request):
 
 @app.get("/pages/{page_name}", response_class=HTMLResponse)
 async def get_page(page_name: str):
-    page_path = Path(f"app/pages/{page_name}.html")
+    page_path = Path(f"pages/{page_name}.html")
     if page_path.exists():
         return HTMLResponse(content=page_path.read_text(), status_code=200)
     return HTMLResponse(content="Page not found", status_code=404)

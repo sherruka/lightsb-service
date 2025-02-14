@@ -21,7 +21,7 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ./env/.env.minio
 
       - name: Build images
-        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.backend.yml --env-file ./env/.env.minio up --build -d
+        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.web.yml --env-file ./env/.env.minio up --build -d
 
       - name: Check running containers
         run: docker ps -a
@@ -38,4 +38,4 @@ jobs:
           done
 
       - name: Stop and remove containers
-        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.backend.yml --env-file ./env/.env.minio  down
+        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.web.yml --env-file ./env/.env.minio  down
