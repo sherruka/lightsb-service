@@ -22,4 +22,3 @@ async def get_page(page_name: str):
     if page_path.exists():
         return HTMLResponse(content=page_path.read_text(), status_code=200)
     return HTMLResponse(content="Page not found", status_code=404)
-
