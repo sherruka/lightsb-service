@@ -35,13 +35,18 @@ jobs:
       
       - name: Wait for services to be ready
         run: |
+          SERVICES_READY=false
           for i in {1..30}; do
+            # Проверка доступности сервисов
             if curl -f http://localhost:9000/minio/health/live && \
               curl -f http://localhost:8000 && \
               curl -f http://localhost:8080 && \
               curl -f http://localhost:15432; then
-              if docker exec postgres pg_isready -U ${{ secrets.POSTGRES_USER }}; then
+              
+              # Проверка готовности PostgreSQL
+              if docker exec postgres pg_isready -U ${POSTGRES_USER}; then
                 echo "PostgreSQL is up!"
+                SERVICES_READY=true
                 break
               else
                 echo "Waiting for PostgreSQL..."
@@ -52,5 +57,19 @@ jobs:
             sleep 5
           done
 
+          # Если сервисы не запустились после 30 попыток, завершаем с ошибкой
+          if [ "$SERVICES_READY" = false ]; then
+            echo "Services failed to start"
+            exit 1
+          fi
+
+      - name: Show logs if services fail
+        if: failure() 
+        run: |
+          echo "Showing service logs..."
+          docker ps -a
+          docker logs postgres || true
+          docker logs minio || true
+  
       - name: Stop and remove containers
         run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.backend.yaml -f ./docker/docker-compose.nginx.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend down
