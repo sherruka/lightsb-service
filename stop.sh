@@ -7,4 +7,3 @@ docker compose \
     --env-file ./env/.env.backend down
 
 sudo rm -rf app/__pycache__ 
-
