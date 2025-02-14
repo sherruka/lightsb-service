@@ -44,7 +44,7 @@ jobs:
               curl -f http://localhost:15432; then
               
               # Проверка готовности PostgreSQL
-              if docker exec postgres pg_isready -U ${POSTGRES_USER}; then
+              if docker exec postgres pg_isready -U ${{ secrets.POSTGRES_USER }}; then
                 echo "PostgreSQL is up!"
                 SERVICES_READY=true
                 break
