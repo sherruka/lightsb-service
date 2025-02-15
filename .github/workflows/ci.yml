@@ -20,22 +20,56 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ./env/.env.minio
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ./env/.env.minio
 
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> ./env/.env.backend
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> ./env/.env.backend
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> ./env/.env.backend
+          echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> ./env/.env.backend
+          echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> ./env/.env.backend
+          echo "PGADMIN_LISTEN_PORT=${{ secrets.PGADMIN_LISTEN_PORT }}" >> ./env/.env.backend
+
       - name: Build images
-        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.backend.yml --env-file ./env/.env.minio up --build -d
+        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.backend.yaml -f ./docker/docker-compose.nginx.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend up --build -d
 
       - name: Check running containers
         run: docker ps -a
       
       - name: Wait for services to be ready
         run: |
+          SERVICES_READY=false
           for i in {1..30}; do
-            if curl -f http://localhost:9000/minio/health/live && curl -f http://localhost:8000; then
-              break
+            # Проверка доступности сервисов
+            if curl -f http://localhost:9000/minio/health/live && \
+              curl -f http://localhost:8000 && \
+              curl -f http://localhost:8080 && \
+              curl -f http://localhost:15432; then
+              
+              # Проверка готовности PostgreSQL
+              if docker exec postgres pg_isready -U ${{ secrets.POSTGRES_USER }}; then
+                echo "PostgreSQL is up!"
+                SERVICES_READY=true
+                break
+              else
+                echo "Waiting for PostgreSQL..."
+              fi
             else
               echo "Waiting for services..."
-              sleep 5
             fi
+            sleep 5
           done
 
+          # Если сервисы не запустились после 30 попыток, завершаем с ошибкой
+          if [ "$SERVICES_READY" = false ]; then
+            echo "Services failed to start"
+            exit 1
+          fi
+
+      - name: Show logs if services fail
+        if: failure() 
+        run: |
+          echo "Showing service logs..."
+          docker ps -a
+          docker logs postgres || true
+          docker logs minio || true
+  
       - name: Stop and remove containers
-        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.backend.yml --env-file ./env/.env.minio  down
+        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.backend.yaml -f ./docker/docker-compose.nginx.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend down
