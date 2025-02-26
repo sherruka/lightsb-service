@@ -215,3 +215,23 @@ body {
     display: flex;
     align-items: center; 
 }
+
+.auth-links {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-family: 'Numans', sans-serif;
+    font-size: 1.5rem;
+    color: #bdbdbd;
+}
+
+.auth-link {
+    color: #bdbdbd;
+    text-decoration: none;
+    margin: 0 5px;
+    transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+    color: #14B8AE;
+}
