@@ -5,7 +5,6 @@ services:
       dockerfile: docker/FastAPI/Dockerfile
     container_name: fastapi
     volumes:
-      - ../app/templates:/app/templates
-      - ../app/pages:/app/pages
+      - ../app:/app
     ports:
       - "8000:8000"

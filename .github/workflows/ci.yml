@@ -23,6 +23,8 @@ jobs:
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> ./env/.env.backend
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> ./env/.env.backend
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> ./env/.env.backend
+          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> ./env/.env.backend
+          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> ./env/.env.backend
           echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> ./env/.env.backend
           echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> ./env/.env.backend
           echo "PGADMIN_LISTEN_PORT=${{ secrets.PGADMIN_LISTEN_PORT }}" >> ./env/.env.backend
