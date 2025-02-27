@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
-from resources.schemas import UserCreate, UserLogin, UserBase
-from database.database import get_db
-from database.user_db import user_repo
-from exceptions import DuplicateUserError, UserNotFoundError, IncorrectPasswordError
+from app.resources.schemas import UserCreate, UserLogin, UserBase
+from app.database.database import get_db
+from app.database.user_db import user_repo
+from app.exceptions import DuplicateUserError, UserNotFoundError, IncorrectPasswordError
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -11,13 +11,14 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 # Регистрация пользователя
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserBase)
 def register_user(request: UserCreate, db: Session = Depends(get_db)):
-    # Проверка на существование пользователя
-    if user_repo.get_user_by_email(db, request.email):
-        raise DuplicateUserError(email=request.email)
 
     # Проверка на существование пользователя
     if user_repo.get_user_by_username(db, request.username):
         raise DuplicateUserError(username=request.username)
+
+    # Проверка на существование пользователя
+    if user_repo.get_user_by_email(db, request.email):
+        raise DuplicateUserError(email=request.email)
 
     # Создаём нового пользователя
     user = user_repo.create_user(db, request)

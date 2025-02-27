@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
-from database.models import UserStatsDB
-from resources.schemas import UserStatsBase, UserStatsUpdate
+from app.database.models import UserStatsDB
+from app.resources.schemas import UserStatsBase, UserStatsUpdate
 
 
 class UserStatsRepository:

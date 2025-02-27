@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
-from database.models import SessionDB
-from resources.schemas import SessionBase
+from app.database.models import SessionDB
+from app.resources.schemas import SessionBase
 
 
 class SessionRepository:
