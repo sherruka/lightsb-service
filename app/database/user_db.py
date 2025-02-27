@@ -2,7 +2,9 @@ from datetime import datetime
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from database.models import UserDB
-from resources.schemas import UserCreate, UserUpdate
+from resources.schemas import UserCreate, UserUpdate, UserProfileBase, UserStatsBase
+from database.user_profile_db import user_profile_repo
+from database.user_stat_db import user_stats_repo
 
 
 class UserRepository:
@@ -10,6 +12,7 @@ class UserRepository:
     def create_user(db: Session, request: UserCreate) -> UserDB:
         # Создаем нового пользователя
         new_user = UserDB(
+            username=request.username,
             email=request.email,
             password_hash=request.password_hash,
             created_at=datetime.utcnow(),
@@ -20,6 +23,13 @@ class UserRepository:
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
+
+        user_profile_repo.create_profile(
+            db, UserProfileBase(), user_id=new_user.user_id
+        )
+
+        user_stats_repo.create_stats(db, UserStatsBase(), user_id=new_user.user_id)
+
         return new_user
 
     @staticmethod
@@ -31,6 +41,11 @@ class UserRepository:
     def get_user_by_email(db: Session, email: str) -> UserDB | None:
         # Получаем пользователя по email
         return db.query(UserDB).filter(UserDB.email == email).first()
+
+    @staticmethod
+    def get_user_by_username(db: Session, username: str) -> UserDB | None:
+        # Получаем пользователя по username
+        return db.query(UserDB).filter(UserDB.username == username).first()
 
     @staticmethod
     def get_users(db: Session) -> list[UserDB]:

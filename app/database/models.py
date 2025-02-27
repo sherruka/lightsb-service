@@ -4,10 +4,12 @@ from sqlalchemy.orm import relationship
 from database.database import Base
 from datetime import datetime
 
+
 class UserDB(Base):
     __tablename__ = "users"
 
     user_id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -18,6 +20,7 @@ class UserDB(Base):
     sessions = relationship("SessionDB", back_populates="user")
     stats = relationship("UserStatsDB", back_populates="user", uselist=False)
     profile = relationship("UserProfileDB", back_populates="user", uselist=False)
+
 
 class SessionDB(Base):
     __tablename__ = "sessions"
@@ -31,6 +34,7 @@ class SessionDB(Base):
 
     user = relationship("UserDB", back_populates="sessions")
 
+
 class UserStatsDB(Base):
     __tablename__ = "user_stats"
 
@@ -42,12 +46,13 @@ class UserStatsDB(Base):
 
     user = relationship("UserDB", back_populates="stats")
 
+
 class UserProfileDB(Base):
     __tablename__ = "user_profiles"
 
     profile_id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
-    full_name = Column(String, nullable=False)
+    full_name = Column(String, nullable=True)
     position = Column(String, nullable=True)
     date_of_birth = Column(DateTime, nullable=True)
     phone_number = Column(String, nullable=True)

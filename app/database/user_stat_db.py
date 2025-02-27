@@ -6,7 +6,9 @@ from resources.schemas import UserStatsBase, UserStatsUpdate
 
 class UserStatsRepository:
     @staticmethod
-    def create_user_stats(db: Session, request: UserStatsBase, user_id: str) -> UserStatsDB:
+    def create_user_stats(
+        db: Session, request: UserStatsBase, user_id: str
+    ) -> UserStatsDB:
         # Создаем статистику пользователя
         new_stats = UserStatsDB(
             user_id=user_id,
@@ -25,7 +27,9 @@ class UserStatsRepository:
         return db.query(UserStatsDB).filter(UserStatsDB.user_id == user_id).first()
 
     @staticmethod
-    def update_user_stats(db: Session, stats: UserStatsDB, request: UserStatsUpdate) -> UserStatsDB:
+    def update_user_stats(
+        db: Session, stats: UserStatsDB, request: UserStatsUpdate
+    ) -> UserStatsDB:
         # Обновляем статистику пользователя, исключая те поля, которые не были заданы
         for key, value in jsonable_encoder(request, exclude_unset=True).items():
             setattr(stats, key, value)

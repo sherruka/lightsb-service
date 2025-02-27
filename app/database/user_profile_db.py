@@ -6,7 +6,9 @@ from resources.schemas import UserProfileBase, UserProfileUpdate
 
 class UserProfileRepository:
     @staticmethod
-    def create_user_profile(db: Session, request: UserProfileBase, user_id: str) -> UserProfileDB:
+    def create_user_profile(
+        db: Session, request: UserProfileBase, user_id: str
+    ) -> UserProfileDB:
         # Создаем профиль пользователя
         new_profile = UserProfileDB(
             user_id=user_id,
@@ -28,7 +30,9 @@ class UserProfileRepository:
         return db.query(UserProfileDB).filter(UserProfileDB.user_id == user_id).first()
 
     @staticmethod
-    def update_user_profile(db: Session, profile: UserProfileDB, request: UserProfileUpdate) -> UserProfileDB:
+    def update_user_profile(
+        db: Session, profile: UserProfileDB, request: UserProfileUpdate
+    ) -> UserProfileDB:
         # Обновляем профиль пользователя, исключая те поля, которые не были заданы
         for key, value in jsonable_encoder(request, exclude_unset=True).items():
             setattr(profile, key, value)

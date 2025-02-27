@@ -7,12 +7,20 @@ from typing import Optional
 class UserCreate(BaseModel):
     email: str
     password_hash: str
-    role: str
+    username: str
+    role: str = "user"
     is_active: bool = True
+
+
+# Схема для входа пользователя
+class UserLogin(BaseModel):
+    identifier: str
+    password: str
 
 
 # Схема для обновления данных пользователя
 class UserUpdate(BaseModel):
+    username: Optional[str] = None
     email: Optional[str] = None
     password_hash: Optional[str] = None
     role: Optional[str] = None
@@ -21,6 +29,7 @@ class UserUpdate(BaseModel):
 
 # Схема для отображения данных пользователя
 class UserBase(BaseModel):
+    username: str
     email: str
     role: str
 
@@ -58,10 +67,9 @@ class Session(SessionBase):
         orm_mode = True
 
 
-
 # Схема для статистики пользователя
 class UserStatsBase(BaseModel):
-    usage_count: int
+    usage_count: Optional[int] = None
     last_used: Optional[datetime] = None
     avg_usage_time: Optional[float] = None
 
@@ -72,6 +80,7 @@ class UserStats(UserStatsBase):
 
     class Config:
         orm_mode = True
+
 
 # Схема для обновления статистики пользователя
 class UserStatsUpdate(BaseModel):
@@ -85,7 +94,7 @@ class UserStatsUpdate(BaseModel):
 
 # Схема для профиля пользователя
 class UserProfileBase(BaseModel):
-    full_name: str
+    full_name: str = None
     position: Optional[str] = None
     date_of_birth: Optional[datetime] = None
     phone_number: Optional[str] = None
@@ -99,6 +108,7 @@ class UserProfile(UserProfileBase):
 
     class Config:
         orm_mode = True
+
 
 # Схема для обновления профиля пользователя
 class UserProfileUpdate(BaseModel):
