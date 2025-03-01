@@ -1,0 +1,34 @@
+from fastapi import HTTPException
+from http import HTTPStatus
+
+
+class DuplicateUserError(HTTPException):
+    def __init__(self, email: str = None, username: str = None):
+        self.email = email
+        self.username = username
+        self.status_code = HTTPStatus.CONFLICT
+        if self.email:
+            self.detail = f"User with email {self.email} already exists."
+        elif self.username:
+            self.detail = f"User with username {self.username} already exists."
+        else:
+            self.detail = "User with the provided credentials already exists."
+
+
+class UserNotFoundError(HTTPException):
+    def __init__(self, email: str = None, username: str = None):
+        self.email = email
+        self.username = username
+        self.status_code = HTTPStatus.NOT_FOUND
+        if self.email:
+            self.detail = f"User with email {self.email} not found."
+        elif self.username:
+            self.detail = f"User with username {self.username} not found."
+        else:
+            self.detail = "User not found."
+
+
+class IncorrectPasswordError(HTTPException):
+    def __init__(self):
+        self.status_code = HTTPStatus.UNAUTHORIZED
+        self.detail = "Incorrect password."
