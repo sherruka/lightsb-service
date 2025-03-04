@@ -2,14 +2,19 @@ from datetime import datetime
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from app.database.models import UserDB
-from app.resources.schemas import UserCreate, UserUpdate, UserProfileBase, UserStatsBase
+from app.resources.schemas import (
+    UserRegister,
+    UserUpdate,
+    UserProfileBase,
+    UserStatsBase,
+)
 from app.database.user_profile_db import user_profile_repo
 from app.database.user_stat_db import user_stats_repo
 
 
 class UserRepository:
     @staticmethod
-    def create_user(db: Session, request: UserCreate) -> UserDB:
+    def create_user(db: Session, request: UserRegister) -> UserDB:
         default_role = "user"
         default_active = True
 
@@ -17,7 +22,7 @@ class UserRepository:
         new_user = UserDB(
             username=request.username,
             email=request.email,
-            password_hash=request.password_hash,
+            password=request.password,
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow(),
             is_active=default_active,

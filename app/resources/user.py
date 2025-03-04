@@ -1,31 +1,34 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from app.resources.schemas import UserCreate, UserLogin, UserBase
+from app.resources.schemas import UserRegister, UserLogin, UserBase
 from app.database.database import get_db
 from app.database.user_db import user_repo
 from app.exceptions import DuplicateUserError, UserNotFoundError, IncorrectPasswordError
+from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 # Регистрация пользователя
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-def register_user(request: UserCreate, db: Session = Depends(get_db)):
+def register_user(request: UserRegister, db: Session = Depends(get_db)):
+    if request.password != request.password_confirm:
+        raise PasswordsDoNotMatchError()
+
     if user_repo.get_user_by_username(db, request.username):
         raise DuplicateUserError(username=request.username)
 
-    # Проверка на существование пользователя
     if user_repo.get_user_by_email(db, request.email):
         raise DuplicateUserError(email=request.email)
 
     user_repo.create_user(db, request)
-    # Редирект на страницу профиля после успешной регистрации
-    return RedirectResponse(url="/pages/profile", status_code=303)
+
+    return JSONResponse(content={"redirect_to": "profile"}, status_code=201)
 
 
 # Вход пользователя
-@router.post("/login", response_model=UserBase)
+@router.post("/login", status_code=status.HTTP_200_OK)
 def login_user(request: UserLogin, db: Session = Depends(get_db)):
     if "@" in request.identifier:
         user = user_repo.get_user_by_email(db, request.identifier)
@@ -40,7 +43,7 @@ def login_user(request: UserLogin, db: Session = Depends(get_db)):
         raise UserNotFoundError(email=email, username=username)
 
     # Проверка пароля
-    if request.password != user.password_hash:
+    if request.password != user.password:
         raise IncorrectPasswordError
 
-    return user
+    return JSONResponse(content={"redirect_to": "profile"}, status_code=201)

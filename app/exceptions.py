@@ -32,3 +32,9 @@ class IncorrectPasswordError(HTTPException):
     def __init__(self):
         self.status_code = HTTPStatus.UNAUTHORIZED
         self.detail = "Incorrect password."
+
+
+class PasswordsDoNotMatchError(HTTPException):
+    def __init__(self):
+        self.status_code = HTTPStatus.BAD_REQUEST
+        self.detail = "Passwords do not match."
