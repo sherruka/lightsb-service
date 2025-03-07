@@ -1,23 +1,37 @@
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.querySelector(".auth-form");
+    // Флаг подтверждения очистки пробелов
+    let spacesConfirmed = false;
 
     if (form) {
         form.addEventListener("submit", async function (event) {
             event.preventDefault(); // Останавливаем стандартную отправку формы
 
-            const formData = new FormData(form); // Сбор данных формы
-
-            // Преобразуем данные формы в объект
+            const formData = new FormData(form);
             const formObject = {};
+            const trimmedFields = [];
+
+            // Цикл обработки данных формы: удаляем лишние пробелы
             formData.forEach((value, key) => {
-                formObject[key] = value.trim(); // Удаляем пробелы в начале и конце
+                const trimmedValue = value.trim();
+                if (value !== trimmedValue) {
+                    trimmedFields.push(key);
+                }
+                formObject[key] = trimmedValue;
             });
 
-            // Валидация имени пользователя
+            // Если обнаружены поля с удалёнными пробелами и подтверждение ещё не дано
+            if (trimmedFields.length > 0 && !spacesConfirmed) {
+                alert("Обнаружены лишние пробелы в следующих полях: " + trimmedFields.join(", ") + ".\nЕсли вы согласны с внесёнными изменениями, нажмите кнопку еще раз.");
+                spacesConfirmed = true;
+                return; // Прерываем обработку, ждем повторного сабмита
+            }
+
+            // Валидация имени пользователя с выводом допустимых символов
             const username = formObject.username;
             const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
             if (!usernameRegex.test(username)) {
-                alert("Имя пользователя должно быть от 3 до 20 символов и содержать только буквы, цифры и символы подчеркивания.");
+                alert("Имя пользователя должно быть от 3 до 20 символов и содержать только допустимые символы: a-z, A-Z, 0-9, _.");
                 return;
             }
 
@@ -50,13 +64,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(formObject) // Отправляем данные как JSON
+                    body: JSON.stringify(formObject)
                 });
 
                 let result = await response.json();
 
                 if (response.ok && result.redirect_to) {
-                    // Перенаправление на нужную страницу после регистрации
                     window.location.href = `/?redirect=${result.redirect_to}`;
                 } else {
                     alert(result.detail || "Регистрация не удалась");
