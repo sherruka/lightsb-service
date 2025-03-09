@@ -1,15 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
 
 
 # Схема для создания нового пользователя
-class UserCreate(BaseModel):
+class UserRegister(BaseModel):
     email: str
-    password_hash: str
     username: str
-    role: str = "user"
-    is_active: bool = True
+    password: str
+    password_confirm: str
 
 
 # Схема для входа пользователя
@@ -22,7 +21,7 @@ class UserLogin(BaseModel):
 class UserUpdate(BaseModel):
     username: Optional[str] = None
     email: Optional[str] = None
-    password_hash: Optional[str] = None
+    password: Optional[str] = None
     role: Optional[str] = None
     is_active: Optional[bool] = None
 
