@@ -6,8 +6,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         try {
             const response = await fetch(`/pages/${page}`);
             if (response.ok) {
-                const html = await response.text();
-                contentArea.innerHTML = html;
+                contentArea.innerHTML = await response.text();
             } else {
                 contentArea.innerHTML = "<h2>Page not found</h2>";
             }
@@ -19,26 +18,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     function activateMenuItem(page) {
         menuItems.forEach(i => i.classList.remove("active"));
         const targetItem = document.querySelector(`.Menu-item[data-page="${page}"]`);
-        if (targetItem) {
-            targetItem.classList.add("active");
-        }
+        if (targetItem) targetItem.classList.add("active");
     }
 
     async function checkRedirect() {
         const params = new URLSearchParams(window.location.search);
         if (params.get("redirect") === "profile") {
-            await loadPage("profile"); 
-            activateMenuItem("profile"); 
-            history.replaceState({}, "", window.location.pathname); 
+            await loadPage("profile");
+            activateMenuItem("profile");
+            history.replaceState({}, "", window.location.pathname);
             return true;
         }
-        return false; 
+        return false;
     }
 
-    const redirected = await checkRedirect(); 
-
-    if (!redirected) {
-        await loadPage("home"); 
+    if (!await checkRedirect()) {
+        await loadPage("home");
         activateMenuItem("home");
     }
 
@@ -48,5 +43,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             activateMenuItem(page);
             await loadPage(page);
         });
+    });
+
+    contentArea.addEventListener("click", async function (e) {
+        if (e.target.matches(".edit-profile-btn")) {
+            e.preventDefault();
+            await loadPage("profile-change");
+        }
     });
 });
