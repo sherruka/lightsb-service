@@ -42,7 +42,7 @@ def register_user(request: UserRegister, db: Session = Depends(get_db)):
 
 # Вход пользователя
 @router.post("/login", status_code=status.HTTP_200_OK)
-def login_user(request: UserLogin,  response: Response, db: Session = Depends(get_db)):
+def login_user(request: UserLogin, response: Response, db: Session = Depends(get_db)):
     if "@" in request.identifier:
         user = user_repo.get_user_by_email(db, request.identifier)
         email = request.identifier
@@ -59,7 +59,9 @@ def login_user(request: UserLogin,  response: Response, db: Session = Depends(ge
         raise IncorrectPasswordError()
 
     access_token = create_jwt_token({"sub": user.user_id}, expires_delta=None)
-    refresh_token = create_jwt_token({"sub": user.user_id}, expires_delta=timedelta(days=7))
+    refresh_token = create_jwt_token(
+        {"sub": user.user_id}, expires_delta=timedelta(days=7)
+    )
 
     # Устанавливаем refresh_token в httpOnly-cookie
     response.set_cookie(
@@ -76,7 +78,7 @@ def login_user(request: UserLogin,  response: Response, db: Session = Depends(ge
             "redirect_to": "profile",
         },
         status_code=200,
-        headers=response.headers, 
+        headers=response.headers,
     )
 
 

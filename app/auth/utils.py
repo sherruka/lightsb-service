@@ -30,16 +30,11 @@ def create_jwt_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     to_encode.update({"exp": expire})
 
-    return jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
-    )
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
 def get_current_user_from_token(token: str):
     try:
-        print(token, flush=True)
-
-
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
@@ -49,14 +44,16 @@ def get_current_user_from_token(token: str):
         raise InvalidTokenError()
 
     user_id = payload.get("sub")
-    print(token, user_id)
+
     if not user_id:
         raise TokenPayloadError()
 
     return user_id
 
 
-def get_user_by_token(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_user_by_token(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+):
     user_id = get_current_user_from_token(token)
     user = user_repo.get_user_by_email(db, user_id)
     if not user:
