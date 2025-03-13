@@ -14,6 +14,9 @@ services:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_DB: ${POSTGRES_DB}
+      SECRET_KEY_TOKEN: ${SECRET_KEY_TOKEN}
+      ALGORITHM_TOKEN: ${ALGORITHM_TOKEN}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
     depends_on:
       postgres:
         condition: service_healthy
