@@ -66,9 +66,9 @@ def login_user(request: UserLogin, response: Response, db: Session = Depends(get
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
-        httponly=True, 
-        secure=True, 
-        samesite="None", 
+        httponly=True,
+        secure=True,
+        samesite="None",
     )
 
     return JSONResponse(
@@ -79,6 +79,7 @@ def login_user(request: UserLogin, response: Response, db: Session = Depends(get
         status_code=200,
         headers=response.headers,
     )
+
 
 # Обновление токена
 @router.post("/refresh", status_code=status.HTTP_200_OK)

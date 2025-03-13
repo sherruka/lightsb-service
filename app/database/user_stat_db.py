@@ -13,6 +13,7 @@ class UserStatsRepository:
         new_stats = UserStatsDB(
             user_id=user_id,
             usage_count=request.usage_count,
+            images_count=request.images_count,
             last_used=request.last_used,
             avg_usage_time=request.avg_usage_time,
         )

@@ -50,25 +50,10 @@ class User(UserBase):
         orm_mode = True
 
 
-# Схема для сессии пользователя
-class SessionBase(BaseModel):
-    login_time: datetime
-    logout_time: Optional[datetime] = None
-    ip_address: str
-    device_info: Optional[str] = None
-
-
-class Session(SessionBase):
-    session_id: str
-    user_id: str
-
-    class Config:
-        orm_mode = True
-
-
 # Схема для статистики пользователя
 class UserStatsBase(BaseModel):
     usage_count: Optional[int] = None
+    images_count: Optional[int] = None
     last_used: Optional[datetime] = None
     avg_usage_time: Optional[float] = None
 
@@ -84,6 +69,7 @@ class UserStats(UserStatsBase):
 # Схема для обновления статистики пользователя
 class UserStatsUpdate(BaseModel):
     usage_count: Optional[int] = None
+    images_count: Optional[int] = None
     last_used: Optional[datetime] = None
     avg_usage_time: Optional[float] = None
 
@@ -96,9 +82,6 @@ class UserProfileBase(BaseModel):
     full_name: str = None
     position: Optional[str] = None
     date_of_birth: Optional[datetime] = None
-    phone_number: Optional[str] = None
-    address: Optional[str] = None
-    avatar_url: Optional[str] = None
 
 
 class UserProfile(UserProfileBase):
@@ -114,9 +97,6 @@ class UserProfileUpdate(BaseModel):
     full_name: Optional[str] = None
     position: Optional[str] = None
     date_of_birth: Optional[datetime] = None
-    phone_number: Optional[str] = None
-    address: Optional[str] = None
-    avatar_url: Optional[str] = None
 
     class Config:
         orm_mode = True

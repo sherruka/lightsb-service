@@ -28,6 +28,7 @@ class UserStatsDB(Base):
     stat_id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
     usage_count = Column(Integer, default=0)
+    images_count = Column(Integer, default=0)
     last_used = Column(DateTime, nullable=True)
     avg_usage_time = Column(Integer, nullable=True)
 
@@ -42,6 +43,5 @@ class UserProfileDB(Base):
     full_name = Column(String, nullable=True)
     position = Column(String, nullable=True)
     date_of_birth = Column(DateTime, nullable=True)
-    phone_number = Column(String, nullable=True)
 
     user = relationship("UserDB", back_populates="profile")
