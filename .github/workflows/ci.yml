@@ -13,7 +13,7 @@ jobs:
       - name: Get repository code
         uses: actions/checkout@v4
 
-      - name: Create .env.minio
+      - name: Create env
         run: |
           echo "MINIO_ROOT_USER=${{ secrets.MINIO_ROOT_USER }}" >> ./env/.env.minio
           echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_ROOT_PASSWORD }}" >> ./env/.env.minio
@@ -28,6 +28,15 @@ jobs:
           echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> ./env/.env.backend
           echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> ./env/.env.backend
           echo "PGADMIN_LISTEN_PORT=${{ secrets.PGADMIN_LISTEN_PORT }}" >> ./env/.env.backend
+          echo "SECRET_KEY_TOKEN=${{ secrets.SECRET_KEY_TOKEN }}" >> ./env/.env.backend
+          echo "ALGORITHM_TOKEN=${{ secrets.ALGORITHM_TOKEN }}" >> ./env/.env.backend
+          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" >> ./env/.env.backend
+
+      - name: Generate SSL certificates
+        run: |
+          mkdir -p docker/nginx/ssl
+          openssl req -x509 -newkey rsa:2048 -keyout docker/nginx/ssl/key.pem -out docker/nginx/ssl/cert.pem -days 365 -nodes \
+          -subj "/C=RU/ST=Nizhny Novgorod Oblast/L=Nizhny Novgorod/O=Higher School of Economics NN/OU=/CN=localhost"
 
       - name: Build images
         run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.backend.yaml -f ./docker/docker-compose.nginx.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend up --build -d
