@@ -9,8 +9,8 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://localhost"],  # Разрешённые источники
-    allow_credentials=True,  # Важно для работы с куками
+    allow_origins=["https://localhost"],  
+    allow_credentials=True, 
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -39,13 +39,6 @@ class PasswordsDoNotMatchError(HTTPException):
         self.status_code = HTTPStatus.BAD_REQUEST
         self.detail = "Passwords do not match."
 
-
-class InvalidСredentialsError(HTTPException):
-    def __init__(self):
-        self.status_code = HTTPStatus.UNAUTHORIZED
-        self.detail = "Could not validate credentials"
-
-
 class InvalidTokenError(HTTPException):
     def __init__(self):
         super().__init__(

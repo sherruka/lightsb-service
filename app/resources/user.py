@@ -8,8 +8,8 @@ from app.exceptions import (
     DuplicateUserError,
     UserNotFoundError,
     IncorrectPasswordError,
-    InvalidСredentialsError,
     NoRefreshTokenError,
+    PasswordsDoNotMatchError,
 )
 from app.auth.hashing import Hash
 from app.auth.utils import create_jwt_token, get_user_by_token
@@ -63,13 +63,12 @@ def login_user(request: UserLogin, response: Response, db: Session = Depends(get
         {"sub": user.user_id}, expires_delta=timedelta(days=7)
     )
 
-    # Устанавливаем refresh_token в httpOnly-cookie
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
-        httponly=True,  # Делаем куку недоступной для JS
-        secure=True,  # Только через HTTPS
-        samesite="None",  # Уменьшает риск CSRF-атак
+        httponly=True, 
+        secure=True, 
+        samesite="None", 
     )
 
     return JSONResponse(
@@ -81,7 +80,7 @@ def login_user(request: UserLogin, response: Response, db: Session = Depends(get
         headers=response.headers,
     )
 
-
+# Обновление токена
 @router.post("/refresh", status_code=status.HTTP_200_OK)
 def refresh_token(request: Request, db: Session = Depends(get_db)):
     refresh_token = request.cookies.get("refresh_token")
@@ -91,7 +90,6 @@ def refresh_token(request: Request, db: Session = Depends(get_db)):
 
     user = get_user_by_token(refresh_token, db)
 
-    # Генерация нового access_token
     new_access_token = create_jwt_token({"sub": user.user_id}, expires_delta=None)
 
     return JSONResponse(
