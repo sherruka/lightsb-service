@@ -15,9 +15,6 @@ class UserProfileRepository:
             full_name=request.full_name,
             position=request.position,
             date_of_birth=request.date_of_birth,
-            phone_number=request.phone_number,
-            address=request.address,
-            avatar_url=request.avatar_url,
         )
         db.add(new_profile)
         db.commit()

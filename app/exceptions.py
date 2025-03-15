@@ -38,3 +38,31 @@ class PasswordsDoNotMatchError(HTTPException):
     def __init__(self):
         self.status_code = HTTPStatus.BAD_REQUEST
         self.detail = "Passwords do not match."
+
+
+class InvalidTokenError(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=HTTPStatus.UNAUTHORIZED, detail="Invalid authentication token"
+        )
+
+
+class ExpiredTokenError(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=HTTPStatus.UNAUTHORIZED, detail="Token has expired"
+        )
+
+
+class TokenPayloadError(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=HTTPStatus.UNAUTHORIZED, detail="Invalid token payload"
+        )
+
+
+class NoRefreshTokenError(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=HTTPStatus.UNAUTHORIZED, detail="No refresh token provided"
+        )
