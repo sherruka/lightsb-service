@@ -28,6 +28,20 @@ class UserNotFoundError(HTTPException):
             self.detail = "User not found."
 
 
+class UserProfileNotFoundError(HTTPException):
+    def __init__(
+        self,
+    ):
+        self.status_code = HTTPStatus.NOT_FOUND
+        self.detail = "User profile not found."
+
+
+class UserProfileUpdateError(HTTPException):
+    def __init__(self):
+        self.status_code = HTTPStatus.INTERNAL_SERVER_ERROR
+        self.detail = "Failed to update profile."
+
+
 class IncorrectPasswordError(HTTPException):
     def __init__(self):
         self.status_code = HTTPStatus.UNAUTHORIZED

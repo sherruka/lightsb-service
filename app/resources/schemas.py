@@ -1,5 +1,5 @@
-from pydantic import BaseModel, EmailStr
-from datetime import datetime
+from pydantic import BaseModel, EmailStr, field_validator
+from datetime import datetime, date
 from typing import Optional
 
 
@@ -81,7 +81,7 @@ class UserStatsUpdate(BaseModel):
 class UserProfileBase(BaseModel):
     full_name: str = None
     position: Optional[str] = None
-    date_of_birth: Optional[datetime] = None
+    date_of_birth: Optional[date] = None
 
 
 class UserProfile(UserProfileBase):
@@ -96,7 +96,8 @@ class UserProfile(UserProfileBase):
 class UserProfileUpdate(BaseModel):
     full_name: Optional[str] = None
     position: Optional[str] = None
-    date_of_birth: Optional[datetime] = None
+    date_of_birth: Optional[date] = None
 
     class Config:
         orm_mode = True
+        from_attributes = True
