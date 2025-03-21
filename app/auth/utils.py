@@ -58,4 +58,3 @@ def get_user_by_token(
     if not user:
         raise UserNotFoundError()
     return user
-
