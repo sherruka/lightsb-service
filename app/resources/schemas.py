@@ -15,6 +15,7 @@ class UserRegister(BaseModel):
 class UserLogin(BaseModel):
     identifier: str
     password: str
+    remember_me: bool = False
 
 
 # Схема для обновления данных пользователя

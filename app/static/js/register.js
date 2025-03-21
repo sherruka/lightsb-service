@@ -1,4 +1,12 @@
-document.addEventListener("DOMContentLoaded", function () {
+import { checkAuth } from "./checkauth.js";
+
+document.addEventListener("DOMContentLoaded", async function () {
+    let isAuthenticated = await checkAuth()
+    if (isAuthenticated) {
+        window.location.href = `/?redirect=profile`;
+        return
+    }
+
     const form = document.querySelector(".auth-form");
     // Флаг подтверждения очистки пробелов
     let spacesConfirmed = false;

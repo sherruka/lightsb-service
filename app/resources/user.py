@@ -62,22 +62,25 @@ def login_user(request: UserLogin, response: Response, db: Session = Depends(get
     if not Hash.verify_password(request.password, user.password):
         raise IncorrectPasswordError()
 
+    refresh_expiry = timedelta(days=30) if request.remember_me else timedelta(days=7)
+
     access_token = create_jwt_token({"sub": user.user_id}, expires_delta=None)
     refresh_token = create_jwt_token(
-        {"sub": user.user_id}, expires_delta=timedelta(days=7)
+        {"sub": user.user_id}, expires_delta=refresh_expiry
     )
 
     response.set_cookie(
-        key="refresh_token",
+        key="refresh_token_lightsb",
         value=refresh_token,
         httponly=True,
         secure=True,
         samesite="None",
+        max_age=30 * 24 * 60 * 60 if request.remember_me else None,
     )
 
     return JSONResponse(
         content={
-            "access_token": access_token,
+            "access_token_lightsb": access_token,
             "redirect_to": "profile",
         },
         status_code=200,
@@ -88,17 +91,17 @@ def login_user(request: UserLogin, response: Response, db: Session = Depends(get
 # Обновление токена
 @router.post("/auth/refresh", status_code=status.HTTP_200_OK)
 def refresh_token(request: Request, db: Session = Depends(get_db)):
-    refresh_token = request.cookies.get("refresh_token")
+    refresh_token = request.cookies.get("refresh_token_lightsb")
 
     if not refresh_token:
         raise NoRefreshTokenError()
 
-    user_id = get_user_id_from_token(refresh_token, db)
+    user_id = get_user_id_from_token(refresh_token)
 
     new_access_token = create_jwt_token({"sub": user_id}, expires_delta=None)
 
     return JSONResponse(
-        content={"access_token": new_access_token},
+        content={"access_token_lightsb": new_access_token},
         status_code=200,
     )
 
@@ -124,3 +127,14 @@ def update_profile(
         content={"redirect_to": "profile"},
         status_code=200,
     )
+
+
+@router.get("/protected-route")
+async def protected_route(current_user: UserDB = Depends(get_user_by_token)):
+    return {"message": "Вы авторизованы!", "user": current_user.user_id}
+
+
+@router.post("/logout")
+async def logout(response: Response):
+    response.delete_cookie("refresh_token_lightsb")
+    return {"message": "Logged out"}

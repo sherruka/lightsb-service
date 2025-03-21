@@ -1,4 +1,11 @@
+import { checkAuth } from "./checkauth.js";
+
 document.addEventListener("DOMContentLoaded", async function () {
+    let isAuthenticated = await checkAuth()
+    if (isAuthenticated) {
+        window.location.href = `/?redirect=profile`;
+    }
+
     const form = document.querySelector(".auth-form");
 
     if (form) {
@@ -13,6 +20,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 formObject[key] = value;
             });
 
+            formObject.remember_me = formData.has("remember_me");
+
             try {
                 // Отправка данных на сервер
                 let response = await fetch("/api/auth/login", {
@@ -26,9 +35,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 let result = await response.json();
 
-                if (response.ok && result.redirect_to && result.access_token) {
-                    // Сохраняем токен в localStorage
-                    sessionStorage.setItem("access_token", result.access_token);
+                if (response.ok && result.redirect_to && result.access_token_lightsb) {
+                    // Сохраняем токен в sessionStorage
+                    sessionStorage.setItem("access_token_lightsb", result.access_token_lightsb);
 
                     // Перенаправление на нужную страницу после регистрации
                     window.location.href = `/?redirect=${result.redirect_to}`;
