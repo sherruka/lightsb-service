@@ -105,7 +105,11 @@ def refresh_token(request: Request, db: Session = Depends(get_db)):
 
 # Обновление профиля
 @router.post("/profile/update", status_code=status.HTTP_200_OK)
-def update_profile(request: UserProfileUpdate, db: Session = Depends(get_db), current_user: UserDB = Depends(get_user_by_token)):
+def update_profile(
+    request: UserProfileUpdate,
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(get_user_by_token),
+):
     profile = user_profile_repo.get_user_profile(db, current_user.user_id)
 
     if not profile:
