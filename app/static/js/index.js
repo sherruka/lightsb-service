@@ -3,7 +3,7 @@ import { checkAuth } from "./checkauth.js";
 import { logout } from "./logout.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
-    await updateAuthUI()
+    let isAuthenticated = await updateAuthUI()
 
     const menuItems = document.querySelectorAll(".Menu-item");
     const contentArea = document.querySelector(".Content-area");
@@ -12,6 +12,31 @@ document.addEventListener("DOMContentLoaded", async function () {
         let isAuthenticated = await checkAuth();
         document.querySelectorAll(".unauthorized").forEach(el => el.style.display = isAuthenticated ? "none" : "block");
         document.querySelectorAll(".authorized").forEach(el => el.style.display = isAuthenticated ? "block" : "none");
+
+        return isAuthenticated;
+    }
+
+    if (isAuthenticated){
+        try {
+            let accessToken = sessionStorage.getItem("access_token_lightsb");
+            let response = await fetch("/api/user", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            });
+
+            if (!response.ok) throw new Error("Failed to load user");
+
+            let data = await response.json(); 
+
+            // Вставляем данные в соответствующие элементы на странице
+            document.querySelectorAll(".Profile-txt").forEach(el => el.textContent = data.username);
+
+        } catch (error) {
+            console.error("Error loading profile:", error);
+        }
     }
 
     // Функция загрузки страниц
@@ -76,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     async function initProfilePage() {
-        updateAuthUI()
+        let isAuthenticated = await updateAuthUI()
 
         const logoutBtn = document.querySelector('.logout-btn');
         const modal = document.getElementById("logout-modal");
@@ -86,6 +111,33 @@ document.addEventListener("DOMContentLoaded", async function () {
         const cancelLogout = document.getElementById("cancel-logout");
 
         const editButton = document.querySelector('.edit-profile-btn');
+
+        if (isAuthenticated){
+            try {
+                let accessToken = sessionStorage.getItem("access_token_lightsb");
+                let response = await fetch("/api/profile", {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) throw new Error("Failed to load profile");
+        
+                let data = await response.json();
+        
+                // Вставляем данные в соответствующие элементы на странице
+                document.querySelectorAll(".Info-item .Info-value")[0].textContent = data.full_name;
+                document.querySelectorAll(".Info-item .Info-value")[1].textContent = data.position;
+                document.querySelectorAll(".Info-item .Info-value")[2].textContent = data.date_of_birth;
+
+            } catch (error) {
+                console.error("Error loading profile:", error);
+            }
+        }
+
+
         if (editButton) {
             editButton.addEventListener('click', async function (e) {
                 e.preventDefault();
@@ -187,6 +239,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     async function initGeneratorPage() {
-        updateAuthUI()
+        let isAuthenticated = await updateAuthUI()
     }
 });

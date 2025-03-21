@@ -43,9 +43,6 @@ class User(UserBase):
     created_at: datetime
     updated_at: datetime
     is_active: bool
-    sessions: Optional[list] = []
-    stats: Optional[dict] = None
-    profile: Optional[dict] = None
 
     class Config:
         orm_mode = True

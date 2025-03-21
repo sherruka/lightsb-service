@@ -1,7 +1,14 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Response, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from app.resources.schemas import UserRegister, UserLogin, UserBase, UserProfileUpdate
+from app.resources.schemas import (
+    UserRegister,
+    UserLogin,
+    UserBase,
+    UserProfileUpdate,
+    UserProfile,
+    User,
+)
 from app.database.database import get_db
 from app.database.models import UserDB
 from app.database.user_db import user_repo
@@ -138,3 +145,40 @@ async def protected_route(current_user: UserDB = Depends(get_user_by_token)):
 async def logout(response: Response):
     response.delete_cookie("refresh_token_lightsb")
     return {"message": "Logged out"}
+
+
+@router.get("/profile", response_model=UserProfile)
+def get_profile(
+    db: Session = Depends(get_db), current_user: UserDB = Depends(get_user_by_token)
+):
+    profile = user_profile_repo.get_user_profile(db, current_user.user_id)
+
+    if not profile:
+        raise UserProfileNotFoundError()
+
+    return {
+        "profile_id": profile.profile_id,
+        "user_id": profile.user_id,
+        "full_name": profile.full_name,
+        "position": profile.position,
+        "date_of_birth": profile.date_of_birth,
+    }
+
+
+@router.get("/user", response_model=User)
+def get_user(
+    db: Session = Depends(get_db), current_user: UserDB = Depends(get_user_by_token)
+):
+
+    if not current_user:
+        raise UserNotFoundError()
+
+    return {
+        "username": current_user.username,
+        "email": current_user.email,
+        "role": current_user.role,
+        "user_id": current_user.user_id,
+        "created_at": current_user.created_at,
+        "updated_at": current_user.updated_at,
+        "is_active": current_user.is_active,
+    }
