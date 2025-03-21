@@ -1,26 +1,30 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Response, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from app.resources.schemas import UserRegister, UserLogin, UserBase
+from app.resources.schemas import UserRegister, UserLogin, UserBase, UserProfileUpdate
 from app.database.database import get_db
+from app.database.models import UserDB
 from app.database.user_db import user_repo
+from app.database.user_profile_db import user_profile_repo
 from app.exceptions import (
     DuplicateUserError,
     UserNotFoundError,
     IncorrectPasswordError,
     NoRefreshTokenError,
     PasswordsDoNotMatchError,
+    UserProfileNotFoundError,
+    UserProfileUpdateError,
 )
 from app.auth.hashing import Hash
-from app.auth.utils import create_jwt_token, get_user_by_token
+from app.auth.utils import create_jwt_token, get_user_id_from_token, get_user_by_token
 from fastapi.responses import JSONResponse
 from datetime import timedelta
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(tags=["auth"])
 
 
 # Регистрация пользователя
-@router.post("/register", status_code=status.HTTP_201_CREATED)
+@router.post("/auth/register", status_code=status.HTTP_201_CREATED)
 def register_user(request: UserRegister, db: Session = Depends(get_db)):
     if request.password != request.password_confirm:
         raise PasswordsDoNotMatchError()
@@ -41,7 +45,7 @@ def register_user(request: UserRegister, db: Session = Depends(get_db)):
 
 
 # Вход пользователя
-@router.post("/login", status_code=status.HTTP_200_OK)
+@router.post("/auth/login", status_code=status.HTTP_200_OK)
 def login_user(request: UserLogin, response: Response, db: Session = Depends(get_db)):
     if "@" in request.identifier:
         user = user_repo.get_user_by_email(db, request.identifier)
@@ -82,18 +86,37 @@ def login_user(request: UserLogin, response: Response, db: Session = Depends(get
 
 
 # Обновление токена
-@router.post("/refresh", status_code=status.HTTP_200_OK)
+@router.post("/auth/refresh", status_code=status.HTTP_200_OK)
 def refresh_token(request: Request, db: Session = Depends(get_db)):
     refresh_token = request.cookies.get("refresh_token")
 
     if not refresh_token:
         raise NoRefreshTokenError()
 
-    user = get_user_by_token(refresh_token, db)
+    user_id = get_user_id_from_token(refresh_token, db)
 
-    new_access_token = create_jwt_token({"sub": user.user_id}, expires_delta=None)
+    new_access_token = create_jwt_token({"sub": user_id}, expires_delta=None)
 
     return JSONResponse(
         content={"access_token": new_access_token},
+        status_code=200,
+    )
+
+
+# Обновление профиля
+@router.post("/profile/update", status_code=status.HTTP_200_OK)
+def update_profile(request: UserProfileUpdate, db: Session = Depends(get_db), current_user: UserDB = Depends(get_user_by_token)):
+    profile = user_profile_repo.get_user_profile(db, current_user.user_id)
+
+    if not profile:
+        raise UserProfileNotFoundError()
+
+    updated_profile = user_profile_repo.update_user_profile(db, profile, request)
+
+    if not updated_profile:
+        raise UserProfileUpdateError()
+
+    return JSONResponse(
+        content={"redirect_to": "profile"},
         status_code=200,
     )

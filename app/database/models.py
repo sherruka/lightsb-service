@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Date
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
 
@@ -42,6 +42,6 @@ class UserProfileDB(Base):
     user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
     full_name = Column(String, nullable=True)
     position = Column(String, nullable=True)
-    date_of_birth = Column(DateTime, nullable=True)
+    date_of_birth = Column(Date, nullable=True)
 
     user = relationship("UserDB", back_populates="profile")
