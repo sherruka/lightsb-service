@@ -77,7 +77,7 @@ class UserStatsUpdate(BaseModel):
 
 # Схема для профиля пользователя
 class UserProfileBase(BaseModel):
-    full_name: str = None
+    full_name: Optional[str] = None
     position: Optional[str] = None
     date_of_birth: Optional[date] = None
 

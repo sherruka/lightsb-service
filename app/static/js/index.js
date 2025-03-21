@@ -189,6 +189,31 @@ document.addEventListener("DOMContentLoaded", async function () {
         const form = document.querySelector(".profile-edit-form");
         if (!form) return;
 
+        if (isAuthenticated){
+            try {
+                let accessToken = sessionStorage.getItem("access_token_lightsb");
+                let response = await fetch("/api/profile", {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) throw new Error("Failed to load profile");
+        
+                let data = await response.json();
+        
+                // Вставляем данные в соответствующие элементы на странице
+                document.getElementById("full_name").value = data.full_name;
+                document.getElementById("position").value = data.position;
+                document.getElementById("date_of_birth").value = data.date_of_birth;
+
+            } catch (error) {
+                console.error("Error loading profile:", error);
+            }
+        }
+
         
         form.addEventListener("submit", async function (e) {
             e.preventDefault();
