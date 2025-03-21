@@ -83,8 +83,15 @@ document.addEventListener("DOMContentLoaded", async function () {
             e.preventDefault();
             const formData = new FormData(form);
             const formObject = {};
-            formData.forEach((value, key) => { formObject[key] = value; });
+            formData.forEach((value, key) => { formObject[key] = value.trim(); });
 
+            const fullName = formObject.full_name;
+            const fullNameRegex = /^[А-ЯЁA-Z][а-яёa-z]+\s[А-ЯЁA-Z][а-яёa-z]+(?:\s[А-ЯЁA-Z][а-яёa-z]+)?$/;
+            if (!fullNameRegex.test(fullName)) {
+                alert("Введите корректное ФИО (Имя и Фамилия обязательны, первая буква заглавная)");
+                return;
+            }
+    
             async function sendProfileUpdate(token) {
                 return fetch("/api/profile/update", {
                     method: "POST",
@@ -121,6 +128,5 @@ document.addEventListener("DOMContentLoaded", async function () {
                 alert("Server error. Try again later.");
             }
         });
-        
     }
 });
