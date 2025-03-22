@@ -23,15 +23,15 @@
                 <h2 class="Sub-title">User Information</h2>
                 <div class="Info-item">
                     <span class="Info-label">Full name:</span>
-                    <span class="Info-value">Zubenko Michael Petrovich</span>
+                    <span class="Info-value"></span>
                 </div>
                 <div class="Info-item">
                     <span class="Info-label">Position:</span>
-                    <span class="Info-value">Junior Data Scientist</span>
+                    <span class="Info-value"></span>
                 </div>
                 <div class="Info-item">
                     <span class="Info-label">Date of birth:</span>
-                    <span class="Info-value">15.03.1936</span>
+                    <span class="Info-value"></span>
                 </div>
                 <button class="edit-profile-btn">Edit Profile</button>
             </div>
@@ -52,7 +52,15 @@
             </div>
         </div>
         <div class="auth-links">
-            <a href="/pages/logout" class="auth-link">Log out</a>
+            <a href="#" class="auth-link logout-btn">Log out</a>
+        </div>
+        
+        <div id="logout-modal" class="modal">
+            <div class="modal-content">
+                <p>Уверены, что хотите выйти?</p>
+                <button id="confirm-logout" class="modal-btn">Выйти</button>
+                <button id="cancel-logout" class="modal-btn">Остаться</button>
+            </div>
         </div>
     </div>
 </body>

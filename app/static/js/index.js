@@ -1,8 +1,43 @@
 import { refreshAccessToken } from "./refresh_token.js";
+import { checkAuth } from "./checkauth.js";
+import { logout } from "./logout.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
+    let isAuthenticated = await updateAuthUI()
+
     const menuItems = document.querySelectorAll(".Menu-item");
     const contentArea = document.querySelector(".Content-area");
+
+    async function updateAuthUI() {
+        let isAuthenticated = await checkAuth();
+        document.querySelectorAll(".unauthorized").forEach(el => el.style.display = isAuthenticated ? "none" : "block");
+        document.querySelectorAll(".authorized").forEach(el => el.style.display = isAuthenticated ? "block" : "none");
+
+        return isAuthenticated;
+    }
+
+    if (isAuthenticated){
+        try {
+            let accessToken = sessionStorage.getItem("access_token_lightsb");
+            let response = await fetch("/api/user", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            });
+
+            if (!response.ok) throw new Error("Failed to load user");
+
+            let data = await response.json(); 
+
+            // Вставляем данные в соответствующие элементы на странице
+            document.querySelectorAll(".Profile-txt").forEach(el => el.textContent = data.username);
+
+        } catch (error) {
+            console.error("Error loading profile:", error);
+        }
+    }
 
     // Функция загрузки страниц
     async function loadPage(page) {
@@ -60,23 +95,124 @@ document.addEventListener("DOMContentLoaded", async function () {
             initProfilePage();  // Инициализация страницы профиля
         } else if (page === "profile-change") {
             initProfileEditPage();  // Инициализация страницы редактирования профиля
-        }
+        } else if (page === "generator") {
+            initGeneratorPage();  // Инициализация страницы генератора
+        }         
     }
 
-    function initProfilePage() {
+    async function initProfilePage() {
+        let isAuthenticated = await updateAuthUI()
+
+        const logoutBtn = document.querySelector('.logout-btn');
+        const modal = document.getElementById("logout-modal");
+        if (modal) modal.style.display = "none";
+
+        const confirmLogout = document.getElementById("confirm-logout");
+        const cancelLogout = document.getElementById("cancel-logout");
+
         const editButton = document.querySelector('.edit-profile-btn');
+
+        if (isAuthenticated){
+            try {
+                let accessToken = sessionStorage.getItem("access_token_lightsb");
+                let response = await fetch("/api/profile", {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) throw new Error("Failed to load profile");
+        
+                let data = await response.json();
+        
+                // Вставляем данные в соответствующие элементы на странице
+                document.querySelectorAll(".Info-item .Info-value")[0].textContent = data.full_name;
+                document.querySelectorAll(".Info-item .Info-value")[1].textContent = data.position;
+                document.querySelectorAll(".Info-item .Info-value")[2].textContent = data.date_of_birth;
+
+            } catch (error) {
+                console.error("Error loading profile:", error);
+            }
+        }
+
+
         if (editButton) {
             editButton.addEventListener('click', async function (e) {
                 e.preventDefault();
                 await loadPage("profile-change");
             });
         }
+    
+        // Открытие модального окна
+        logoutBtn.addEventListener("click", function (event) {
+            event.preventDefault();
+            modal.style.display = "flex";
+        });
+    
+        // Закрытие модального окна
+        cancelLogout.addEventListener("click", function () {
+            modal.style.display = "none";
+        });
+    
+        // Подтверждение выхода
+        confirmLogout.addEventListener("click", async function () {
+            modal.style.display = "none";
+    
+            // Выход
+            try {
+                logout()
+                window.location.reload();
+            } catch (error) {
+                console.error("Ошибка выхода:", error);
+            }
+        });
+    
+        // Закрытие модального окна при клике вне него
+        window.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
     }
 
     // Инициализация страницы редактирования профиля
-    function initProfileEditPage() {
+    async function initProfileEditPage() {
+        let isAuthenticated = await checkAuth()
+
+        if (!isAuthenticated) {
+            alert("You are not logged in, please log in.");
+            window.location.href = "/pages/login";
+        }
+
         const form = document.querySelector(".profile-edit-form");
         if (!form) return;
+
+        if (isAuthenticated){
+            try {
+                let accessToken = sessionStorage.getItem("access_token_lightsb");
+                let response = await fetch("/api/profile", {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) throw new Error("Failed to load profile");
+        
+                let data = await response.json();
+        
+                // Вставляем данные в соответствующие элементы на странице
+                document.getElementById("full_name").value = data.full_name;
+                document.getElementById("position").value = data.position;
+                document.getElementById("date_of_birth").value = data.date_of_birth;
+
+            } catch (error) {
+                console.error("Error loading profile:", error);
+            }
+        }
 
         
         form.addEventListener("submit", async function (e) {
@@ -104,7 +240,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 });
             }
 
-            let accessToken = sessionStorage.getItem("access_token");
+            let accessToken = sessionStorage.getItem("access_token_lightsb");
             let response = await sendProfileUpdate(accessToken);
 
             if (response.status === 401) {  // Токен истек
@@ -113,6 +249,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                 if (newAccessToken) {
                     // Повторяем запрос с новым токеном
                     response = await sendProfileUpdate(newAccessToken);
+                } else{
+                    alert("Session expired, please log in again.");
+                    window.location.href = "/pages/login";
                 }
             }
 
@@ -128,5 +267,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                 alert("Server error. Try again later.");
             }
         });
+    }
+
+    async function initGeneratorPage() {
+        let isAuthenticated = await updateAuthUI()
     }
 });

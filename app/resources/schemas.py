@@ -15,6 +15,7 @@ class UserRegister(BaseModel):
 class UserLogin(BaseModel):
     identifier: str
     password: str
+    remember_me: bool = False
 
 
 # Схема для обновления данных пользователя
@@ -42,9 +43,6 @@ class User(UserBase):
     created_at: datetime
     updated_at: datetime
     is_active: bool
-    sessions: Optional[list] = []
-    stats: Optional[dict] = None
-    profile: Optional[dict] = None
 
     class Config:
         orm_mode = True
@@ -79,7 +77,7 @@ class UserStatsUpdate(BaseModel):
 
 # Схема для профиля пользователя
 class UserProfileBase(BaseModel):
-    full_name: str = None
+    full_name: Optional[str] = None
     position: Optional[str] = None
     date_of_birth: Optional[date] = None
 

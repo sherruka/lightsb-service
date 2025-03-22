@@ -1,4 +1,6 @@
-export async function refreshAccessToken() {
+import { logout } from "./logout.js";
+
+export async function refreshAccessToken(redirectOnFailure = true) {
     try{
         const response = await fetch("/api/auth/refresh", {
             method: "POST",
@@ -10,17 +12,29 @@ export async function refreshAccessToken() {
 
         if (response.ok) {
             const result = await response.json();
-            sessionStorage.setItem("access_token", result.access_token);
-            return result.access_token;
+            sessionStorage.setItem("access_token_lightsb", result.access_token_lightsb);
+            return result.access_token_lightsb;
         } else {
-            // Если refresh token невалиден, пользователь должен заново войти
-            alert("Session expired, please log in again.");
-            sessionStorage.removeItem("access_token");
-            window.location.href = "/pages/login";
+            console.warn("Refresh token invalid or expired.");
+
+            logout()
+
+            if (redirectOnFailure) {
+                alert("Session expired, please log in again.");
+                window.location.href = "/pages/login";
+            }
+
+            return null;
         }
     } catch (error) {
         console.error("Error refreshing token:", error);
-        alert("Something went wrong. Please log in again.");
-        window.location.href = "/pages/login";
+        logout()
+
+        if (redirectOnFailure) {
+            alert("Something went wrong. Please log in again.");
+            window.location.href = "/pages/login";
+        }
+
+        return null;
     }
 }
