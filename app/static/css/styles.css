@@ -58,6 +58,19 @@ body {
     background: #525252;
 }
 
+.Menu-item .authorized, .Menu-item .unauthorized {
+    flex: 1;
+    min-width: 0;
+}
+
+.Menu-item .Profile-txt {
+    display: block;
+    max-width: calc(100% - 20px);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
 .Profile {
     position: relative;
     height: 119px;
