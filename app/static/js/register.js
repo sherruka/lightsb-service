@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             // Если обнаружены поля с удалёнными пробелами и подтверждение ещё не дано
             if (trimmedFields.length > 0 && !spacesConfirmed) {
-                alert("Обнаружены лишние пробелы в следующих полях: " + trimmedFields.join(", ") + ".\nЕсли вы согласны с внесёнными изменениями, нажмите кнопку еще раз.");
+                alert("Extra spaces were detected in the following fields: " + trimmedFields.join(", ") + ".\nIf you agree with the changes made, click the button again.");
                 spacesConfirmed = true;
                 return; // Прерываем обработку, ждем повторного сабмита
             }
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             const username = formObject.username;
             const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
             if (!usernameRegex.test(username)) {
-                alert("Имя пользователя должно быть от 3 до 20 символов и содержать только допустимые символы: a-z, A-Z, 0-9, _.");
+                alert("The username must be between 3 and 20 characters and contain only valid characters: a-z, A-Z, 0-9, _.");
                 return;
             }
 
@@ -47,21 +47,21 @@ document.addEventListener("DOMContentLoaded", async function () {
             const email = formObject.email;
             const emailRegex = /^\S+@\S+\.\S+$/;
             if (!emailRegex.test(email)) {
-                alert("Пожалуйста, введите корректный адрес электронной почты.");
+                alert("Please enter a valid email address.");
                 return;
             }
 
             // Валидация пароля
             const password = formObject.password;
             if (password.length < 8) {
-                alert("Пароль должен содержать минимум 8 символов.");
+                alert("The password must contain a minimum of 8 characters.");
                 return;
             }
 
             // Проверка на совпадение паролей
             const passwordConfirm = formObject.password_confirm;
             if (password !== passwordConfirm) {
-                alert("Пароли не совпадают!");
+                alert("The passwords don't match!");
                 return;
             }
 
@@ -80,11 +80,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                 if (response.ok && result.redirect_to) {
                     window.location.href = `/?redirect=${result.redirect_to}`;
                 } else {
-                    alert(result.detail || "Регистрация не удалась");
+                    alert(result.detail || "Registration failed");
                 }
             } catch (error) {
-                console.error("Ошибка при отправке данных:", error);
-                alert("Произошла ошибка при регистрации. Пожалуйста, попробуйте позже.");
+                console.error("Error when sending data:", error);
+                alert("There was an error during registration. Please try again later.");
             }
         });
     }

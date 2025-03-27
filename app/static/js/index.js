@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             const fullName = formObject.full_name;
             const fullNameRegex = /^[А-ЯЁA-Z][а-яёa-z]+\s[А-ЯЁA-Z][а-яёa-z]+(?:\s[А-ЯЁA-Z][а-яёa-z]+)?$/;
             if (!fullNameRegex.test(fullName)) {
-                alert("Введите корректное ФИО (Имя и Фамилия обязательны, первая буква заглавная)");
+                alert("Enter correct full name (First and Last name is required, first letter in uppercase)");
                 return;
             }
     
