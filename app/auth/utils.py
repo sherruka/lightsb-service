@@ -10,9 +10,9 @@ from app.auth.settings import settings
 from app.database.database import get_db
 from app.database.user_db import user_repo
 from app.exceptions import (
-    TokenPayloadError,
     ExpiredTokenError,
     InvalidTokenError,
+    TokenPayloadError,
     UserNotFoundError,
 )
 

@@ -1,6 +1,7 @@
-from pydantic import BaseModel, EmailStr, field_validator
-from datetime import datetime, date
+from datetime import date, datetime
 from typing import Optional
+
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 # Схема для создания нового пользователя
