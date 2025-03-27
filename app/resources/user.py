@@ -1,31 +1,32 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Response, Request
-from fastapi.responses import RedirectResponse
+from datetime import timedelta
+
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
-from app.resources.schemas import (
-    UserRegister,
-    UserLogin,
-    UserBase,
-    UserProfileUpdate,
-    UserProfile,
-    User,
-)
+
+from app.auth.hashing import Hash
+from app.auth.utils import create_jwt_token, get_user_by_token, get_user_id_from_token
 from app.database.database import get_db
 from app.database.models import UserDB
 from app.database.user_db import user_repo
 from app.database.user_profile_db import user_profile_repo
 from app.exceptions import (
     DuplicateUserError,
-    UserNotFoundError,
     IncorrectPasswordError,
     NoRefreshTokenError,
     PasswordsDoNotMatchError,
+    UserNotFoundError,
     UserProfileNotFoundError,
     UserProfileUpdateError,
 )
-from app.auth.hashing import Hash
-from app.auth.utils import create_jwt_token, get_user_id_from_token, get_user_by_token
-from fastapi.responses import JSONResponse
-from datetime import timedelta
+from app.resources.schemas import (
+    User,
+    UserBase,
+    UserLogin,
+    UserProfile,
+    UserProfileUpdate,
+    UserRegister,
+)
 
 router = APIRouter(tags=["auth"])
 

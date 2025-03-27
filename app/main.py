@@ -1,8 +1,10 @@
+from pathlib import Path
+
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.middleware.cors import CORSMiddleware
-from pathlib import Path
+
 from app.resources.user import router
 
 app = FastAPI()

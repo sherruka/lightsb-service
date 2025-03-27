@@ -1,5 +1,6 @@
-from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy.orm import Session
+
 from app.database.models import UserProfileDB
 from app.resources.schemas import UserProfileBase, UserProfileUpdate
 

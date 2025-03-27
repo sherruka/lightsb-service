@@ -1,5 +1,6 @@
-from fastapi import HTTPException
 from http import HTTPStatus
+
+from fastapi import HTTPException
 
 
 class DuplicateUserError(HTTPException):

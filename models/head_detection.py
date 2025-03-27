@@ -1,6 +1,6 @@
+import cv2
 from ultralytics import YOLO
 from ultralytics.utils.plotting import Annotator, colors
-import cv2
 
 
 class head_detector:

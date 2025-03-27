@@ -1,15 +1,17 @@
 from datetime import datetime
+
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+
 from app.database.models import UserDB
-from app.resources.schemas import (
-    UserRegister,
-    UserUpdate,
-    UserProfileBase,
-    UserStatsBase,
-)
 from app.database.user_profile_db import user_profile_repo
 from app.database.user_stat_db import user_stats_repo
+from app.resources.schemas import (
+    UserProfileBase,
+    UserRegister,
+    UserStatsBase,
+    UserUpdate,
+)
 
 
 class UserRepository:
