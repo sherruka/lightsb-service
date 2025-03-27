@@ -10,7 +10,7 @@ export async function checkAuth() {
             });
 
             if (!response.ok) {
-                throw new Error("Токен недействителен");
+                throw new Error("The token is invalid");
             }
 
             return true
