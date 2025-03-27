@@ -425,9 +425,6 @@ body {
     display: block;
 }
 
-
-
-
 /* Затемнение фона */
 .modal {
     display: none; /* Скрыто по умолчанию */
@@ -445,11 +442,19 @@ body {
 
 /* Контент модального окна */
 .modal-content {
-    background: red;
+    background: #3d3d3d;
     padding: 20px;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+}
+
+.modal-content p {
+    font-family: 'Numans', sans-serif;
+    font-size: clamp(18px, 2.5vw, 25px);
+    color: #989898;
+    margin-bottom: 20px;
 }
 
 /* Кнопки */
@@ -459,14 +464,24 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-family: 'Numans', sans-serif;
+    font-size: 1.2rem;
 }
 
 #confirm-logout {
-    background-color: red;
+    background-color: #14B8AE;
     color: white;
 }
 
+#confirm-logout:hover {
+    background-color: #0e807a;
+}
+
 #cancel-logout {
-    background-color: gray;
-    color: white;
+    background-color: #656565;
+    color: #bdbdbd;
+}
+
+#cancel-logout:hover {
+    background-color: #787878;
 }
