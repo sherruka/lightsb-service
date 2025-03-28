@@ -3,12 +3,18 @@ import { checkAuth } from "./checkauth.js";
 import { logout } from "./logout.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
-    let isAuthenticated = await updateAuthUI()
+    // Initially hide auth-related UI elements to prevent any flash until check completes.
+    document.querySelectorAll(".unauthorized, .authorized").forEach(el => el.style.display = "none");
+
+    let isAuthenticated = await updateAuthUI();
 
     const menuItems = document.querySelectorAll(".Menu-item");
     const contentArea = document.querySelector(".Content-area");
 
     async function updateAuthUI() {
+        // Ensure elements are hidden while the auth check is pending.
+        document.querySelectorAll(".unauthorized, .authorized").forEach(el => el.style.display = "none");
+
         let isAuthenticated = await checkAuth();
         document.querySelectorAll(".unauthorized").forEach(el => el.style.display = isAuthenticated ? "none" : "block");
         document.querySelectorAll(".authorized").forEach(el => el.style.display = isAuthenticated ? "block" : "none");
@@ -16,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         return isAuthenticated;
     }
 
-    if (isAuthenticated){
+    if (isAuthenticated) {
         try {
             let accessToken = sessionStorage.getItem("access_token_lightsb");
             let response = await fetch("/api/user", {
@@ -31,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             let data = await response.json(); 
 
-            // Вставляем данные в соответствующие элементы на странице
+            // Insert the username into the profile text elements
             document.querySelectorAll(".Profile-txt").forEach(el => el.textContent = data.username);
 
         } catch (error) {
@@ -39,13 +45,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // Функция загрузки страниц
+    // Function to load pages
     async function loadPage(page) {
         try {
             const response = await fetch(`/pages/${page}`);
             if (response.ok) {
                 contentArea.innerHTML = await response.text();
-                // После загрузки страницы инициализируем обработчики для этой страницы
+                // Initialize page-specific handlers after the content loads
                 requestAnimationFrame(() => initPage(page));
             } else {
                 contentArea.innerHTML = "<h2>Page not found</h2>";
@@ -55,14 +61,14 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // Функция активации элемента меню
+    // Function to activate a menu item
     function activateMenuItem(page) {
         menuItems.forEach(i => i.classList.remove("active"));
         const targetItem = document.querySelector(`.Menu-item[data-page="${page}"]`);
         if (targetItem) targetItem.classList.add("active");
     }
 
-    // Функция проверки редиректа
+    // Function to check for redirect parameters
     async function checkRedirect() {
         const params = new URLSearchParams(window.location.search);
         if (params.get("redirect") === "profile") {
@@ -74,13 +80,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         return false;
     }
 
-    // Загрузка домашней страницы или страницы редиректа
+    // Load home page or redirect page
     if (!await checkRedirect()) {
         await loadPage("home");
         activateMenuItem("home");
     }
 
-    // Обработчик кликов по меню
+    // Menu item click handler
     menuItems.forEach(item => {
         item.addEventListener("click", async function () {
             const page = this.dataset.page;
@@ -89,19 +95,19 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     });
 
-    // Функция для инициализации страниц с их специфичными обработчиками
+    // Initialize page-specific functionality
     function initPage(page) {
         if (page === "profile") {
-            initProfilePage();  // Инициализация страницы профиля
+            initProfilePage();  // Profile page initialization
         } else if (page === "profile-change") {
-            initProfileEditPage();  // Инициализация страницы редактирования профиля
+            initProfileEditPage();  // Profile edit page initialization
         } else if (page === "generator") {
-            initGeneratorPage();  // Инициализация страницы генератора
+            initGeneratorPage();  // Generator page initialization
         }         
     }
 
     async function initProfilePage() {
-        let isAuthenticated = await updateAuthUI()
+        let isAuthenticated = await updateAuthUI();
 
         const logoutBtn = document.querySelector('.logout-btn');
         const modal = document.getElementById("logout-modal");
@@ -112,7 +118,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const editButton = document.querySelector('.edit-profile-btn');
 
-        if (isAuthenticated){
+        if (isAuthenticated) {
             try {
                 let accessToken = sessionStorage.getItem("access_token_lightsb");
                 let response = await fetch("/api/profile", {
@@ -127,7 +133,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         
                 let data = await response.json();
         
-                // Вставляем данные в соответствующие элементы на странице
+                // Insert profile data into the appropriate page elements
                 document.querySelectorAll(".Info-item .Info-value")[0].textContent = data.full_name;
                 document.querySelectorAll(".Info-item .Info-value")[1].textContent = data.position;
                 document.querySelectorAll(".Info-item .Info-value")[2].textContent = data.date_of_birth;
@@ -137,7 +143,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         }
 
-
         if (editButton) {
             editButton.addEventListener('click', async function (e) {
                 e.preventDefault();
@@ -145,31 +150,30 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
         }
     
-        // Открытие модального окна
+        // Open logout modal
         logoutBtn.addEventListener("click", function (event) {
             event.preventDefault();
             modal.style.display = "flex";
         });
     
-        // Закрытие модального окна
+        // Close modal on cancel
         cancelLogout.addEventListener("click", function () {
             modal.style.display = "none";
         });
     
-        // Подтверждение выхода
+        // Confirm logout action
         confirmLogout.addEventListener("click", async function () {
             modal.style.display = "none";
     
-            // Выход
             try {
-                logout()
+                logout();
                 window.location.reload();
             } catch (error) {
                 console.error("Ошибка выхода:", error);
             }
         });
     
-        // Закрытие модального окна при клике вне него
+        // Close modal when clicking outside of it
         window.addEventListener("click", function (event) {
             if (event.target === modal) {
                 modal.style.display = "none";
@@ -177,9 +181,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
-    // Инициализация страницы редактирования профиля
+    // Profile edit page initialization
     async function initProfileEditPage() {
-        let isAuthenticated = await checkAuth()
+        let isAuthenticated = await updateAuthUI();
 
         if (!isAuthenticated) {
             alert("You are not logged in, please log in.");
@@ -189,7 +193,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const form = document.querySelector(".profile-edit-form");
         if (!form) return;
 
-        if (isAuthenticated){
+        if (isAuthenticated) {
             try {
                 let accessToken = sessionStorage.getItem("access_token_lightsb");
                 let response = await fetch("/api/profile", {
@@ -204,7 +208,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         
                 let data = await response.json();
         
-                // Вставляем данные в соответствующие элементы на странице
+                // Populate form fields with profile data
                 document.getElementById("full_name").value = data.full_name;
                 document.getElementById("position").value = data.position;
                 document.getElementById("date_of_birth").value = data.date_of_birth;
@@ -214,7 +218,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         }
 
-        
         form.addEventListener("submit", async function (e) {
             e.preventDefault();
             const formData = new FormData(form);
@@ -234,7 +237,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     headers: {
                         "Content-Type": "application/json",
                         "Accept": "application/json",
-                        Authorization: `Bearer ${token}`,
+                        "Authorization": `Bearer ${token}`,
                     },
                     body: JSON.stringify(formObject),
                 });
@@ -243,13 +246,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             let accessToken = sessionStorage.getItem("access_token_lightsb");
             let response = await sendProfileUpdate(accessToken);
 
-            if (response.status === 401) {  // Токен истек
+            if (response.status === 401) {  // Token expired
                 const newAccessToken = await refreshAccessToken();
 
                 if (newAccessToken) {
-                    // Повторяем запрос с новым токеном
+                    // Retry request with new token
                     response = await sendProfileUpdate(newAccessToken);
-                } else{
+                } else {
                     alert("Session expired, please log in again.");
                     window.location.href = "/pages/login";
                 }
@@ -257,7 +260,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             try {
                 let result = await response.json();
-                if(response.ok && result.redirect_to){
+                if (response.ok && result.redirect_to) {
                     window.location.href = `/?redirect=${result.redirect_to}`;
                 } else {
                     alert(result.detail || "Update failed");
@@ -270,6 +273,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     async function initGeneratorPage() {
-        let isAuthenticated = await updateAuthUI()
+        let isAuthenticated = await updateAuthUI();
     }
 });
