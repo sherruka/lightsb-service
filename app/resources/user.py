@@ -10,6 +10,7 @@ from app.database.database import get_db
 from app.database.models import UserDB
 from app.database.user_db import user_repo
 from app.database.user_profile_db import user_profile_repo
+from app.database.user_stat_db import user_stats_repo
 from app.exceptions import (
     DuplicateUserError,
     IncorrectPasswordError,
@@ -18,6 +19,7 @@ from app.exceptions import (
     UserNotFoundError,
     UserProfileNotFoundError,
     UserProfileUpdateError,
+    UserStatsNotFoundError,
 )
 from app.resources.schemas import (
     User,
@@ -26,6 +28,7 @@ from app.resources.schemas import (
     UserProfile,
     UserProfileUpdate,
     UserRegister,
+    UserStats,
 )
 
 router = APIRouter(tags=["auth"])
@@ -152,6 +155,9 @@ async def logout(response: Response):
 def get_profile(
     db: Session = Depends(get_db), current_user: UserDB = Depends(get_user_by_token)
 ):
+    if not current_user:
+        raise UserNotFoundError()
+
     profile = user_profile_repo.get_user_profile(db, current_user.user_id)
 
     if not profile:
@@ -182,4 +188,27 @@ def get_user(
         "created_at": current_user.created_at,
         "updated_at": current_user.updated_at,
         "is_active": current_user.is_active,
+    }
+
+
+@router.get("/stats", response_model=UserStats)
+def get_stats(
+    db: Session = Depends(get_db), current_user: UserDB = Depends(get_user_by_token)
+):
+
+    if not current_user:
+        raise UserNotFoundError()
+
+    stats = user_stats_repo.get_user_stats(db, current_user.user_id)
+
+    if not stats:
+        raise UserStatsNotFoundError()
+
+    return {
+        "stat_id": stats.stat_id,
+        "user_id": stats.user_id,
+        "usage_count": stats.usage_count,
+        "images_count": stats.images_count,
+        "last_used": stats.last_used,
+        "avg_usage_time": stats.avg_usage_time,
     }

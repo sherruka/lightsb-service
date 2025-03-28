@@ -37,6 +37,14 @@ class UserProfileNotFoundError(HTTPException):
         self.detail = "User profile not found."
 
 
+class UserStatsNotFoundError(HTTPException):
+    def __init__(
+        self,
+    ):
+        self.status_code = HTTPStatus.NOT_FOUND
+        self.detail = "User stats not found."
+
+
 class UserProfileUpdateError(HTTPException):
     def __init__(self):
         self.status_code = HTTPStatus.INTERNAL_SERVER_ERROR
