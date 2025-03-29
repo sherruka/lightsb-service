@@ -106,6 +106,34 @@ document.addEventListener("DOMContentLoaded", async function () {
         }         
     }
 
+    function formatTime(seconds) {
+        if (!seconds) {
+            return `-`
+        } else if (seconds < 1) {
+            return `${Math.round(seconds * 1000)} ms`;
+        } else if (seconds < 60) {
+            return `${seconds.toFixed(2)} s`;
+        } else {
+            let minutes = Math.floor(seconds / 60);
+            let sec = (seconds % 60).toFixed(0);
+            return `${minutes}m ${sec}s`;
+        }
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return "Never used";
+    
+        let date = new Date(dateString);
+        return date.toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+    }
+
     async function initProfilePage() {
         let isAuthenticated = await updateAuthUI();
 
@@ -140,6 +168,31 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             } catch (error) {
                 console.error("Error loading profile:", error);
+            }
+        }
+
+        if (isAuthenticated) {
+            try {
+                let accessToken = sessionStorage.getItem("access_token_lightsb");
+                let response = await fetch("/api/stats", {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) throw new Error("Failed to load stats");
+        
+                let data = await response.json();
+        
+                document.querySelectorAll(".Stat-item .Stat-value")[0].textContent = data.usage_count;
+                document.querySelectorAll(".Stat-item .Stat-value")[1].textContent = data.images_count;
+                document.querySelectorAll(".Stat-item .Stat-value")[2].textContent = formatDate(data.last_used);
+                document.querySelectorAll(".Stat-item .Stat-value")[3].textContent = formatTime(data.avg_usage_time);
+
+            } catch (error) {
+                console.error("Error loading stats:", error);
             }
         }
 
