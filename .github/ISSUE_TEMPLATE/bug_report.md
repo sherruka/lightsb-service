@@ -7,12 +7,11 @@ assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Описание бага/недоработки**
+Краткое описание того, в чем заключается баг/недоработка.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Шаги по воспроизведению**
+Чтобы воспроизвести данный баг, нужно:
+1. Сделать бла-бла-бла
+2. Сделать бла-бла-бла
+3. ...

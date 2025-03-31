@@ -7,8 +7,8 @@ assignees: ''
 
 ---
 
-**What feature do you want to impove?**
-Describe existing feature.
+**Описание того, какой компонент будет улучшен**
+Описать существующую фичу, которую требуется доработать.
 
-**What's new?**
-Steps which need to do to upgrade feature.
+**Какие изменения предлагает данное улучшение?**
+Нововведения, предлагаемые данной доработкой.

@@ -7,8 +7,11 @@ assignees: ''
 
 ---
 
-**Describe the feature.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Описание фичи**
+Какие аспекты затрагивает новая фича и что будет делать.
 
-**Steps to reliase**
-Add steps how your feature can realise
+**Шаги реализации**
+Чтобы реализовать фичу, нужно:
+1. Сделать бла-бла-бла
+2. Сделать бла-бла-бла
+3. ...
