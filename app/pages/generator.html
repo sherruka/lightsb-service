@@ -1,19 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
-  <h1 class="Main-text">Generator</h1>
-  <div class="authorized">
-    <div class="Generator-content">
-      <p class="Second-text">Try our powerful generator tool.</p>
+    <h1 class="Main-text">Generator</h1>
+
+    <div class="authorized">
+        <div class="Generator-content">
+            <p class="Second-text">Try our powerful generator tool.</p>
+
+            <form id="generator-form" class="generator-form">
+                <div class="form-group">
+                    <label for="image-upload" class="form-label">Upload an image:</label>
+                    <input type="file" id="image-upload" class="form-input" accept="image/*">
+                </div>
+                
+                <button type="submit" class="generate-btn">Generate</button>
+            </form>
+
+            <div id="result" class="result-container">
+                <p class="Second-text" id="loading-text" style="display: none;">Processing your image...</p>
+                <div class="result-images">
+                    <img id="generated-image" class="generated-image" src="/placeholder.svg" alt="Generated result" style="display: none;">
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="unauthorized">
-    <p class="Second-text">This page is not available. Please register or login to continue.</p>
-  </div>
+
+    <div class="unauthorized">
+        <p class="Second-text">This page is not available. Please register or login to continue.</p>
+    </div>
+
+    <script src="/static/js/generator.js"></script>
 </body>
 </html>
