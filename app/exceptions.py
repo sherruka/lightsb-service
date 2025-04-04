@@ -1,5 +1,6 @@
-from fastapi import HTTPException
 from http import HTTPStatus
+
+from fastapi import HTTPException
 
 
 class DuplicateUserError(HTTPException):
@@ -26,6 +27,28 @@ class UserNotFoundError(HTTPException):
             self.detail = f"User with username {self.username} not found."
         else:
             self.detail = "User not found."
+
+
+class UserProfileNotFoundError(HTTPException):
+    def __init__(
+        self,
+    ):
+        self.status_code = HTTPStatus.NOT_FOUND
+        self.detail = "User profile not found."
+
+
+class UserStatsNotFoundError(HTTPException):
+    def __init__(
+        self,
+    ):
+        self.status_code = HTTPStatus.NOT_FOUND
+        self.detail = "User stats not found."
+
+
+class UserProfileUpdateError(HTTPException):
+    def __init__(self):
+        self.status_code = HTTPStatus.INTERNAL_SERVER_ERROR
+        self.detail = "Failed to update profile."
 
 
 class IncorrectPasswordError(HTTPException):

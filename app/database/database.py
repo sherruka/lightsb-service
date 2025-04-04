@@ -1,8 +1,10 @@
+import os
 from typing import Any, Generator
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.orm.session import Session
-import os
+
 from app.database.models import Base
 
 POSTGRES_USER = os.getenv("POSTGRES_USER", "default_user")

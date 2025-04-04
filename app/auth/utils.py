@@ -10,9 +10,9 @@ from app.auth.settings import settings
 from app.database.database import get_db
 from app.database.user_db import user_repo
 from app.exceptions import (
-    TokenPayloadError,
     ExpiredTokenError,
     InvalidTokenError,
+    TokenPayloadError,
     UserNotFoundError,
 )
 
@@ -32,7 +32,7 @@ def create_jwt_token(data: dict, expires_delta: Optional[timedelta] = None):
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
-def get_current_user_from_token(token: str):
+def get_user_id_from_token(token: str):
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
@@ -53,8 +53,8 @@ def get_current_user_from_token(token: str):
 def get_user_by_token(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ):
-    user_id = get_current_user_from_token(token)
-    user = user_repo.get_user_by_email(db, user_id)
+    user_id = get_user_id_from_token(token)
+    user = user_repo.get_user(db, user_id)
     if not user:
         raise UserNotFoundError()
     return user

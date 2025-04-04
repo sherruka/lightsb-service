@@ -1,6 +1,7 @@
+import os
+
 from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
-import os
 
 
 class Settings(BaseSettings):
