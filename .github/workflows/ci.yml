@@ -74,6 +74,9 @@ jobs:
             exit 1
           fi
 
+      - name: tests
+        run: docker exec fastapi pytest tests/test_user.py --disable-warnings --maxfail=1
+
       - name: Show logs if services fail
         if: failure() 
         run: |
