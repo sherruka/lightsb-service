@@ -1,0 +1,348 @@
+import argparse
+import inspect
+import logging
+import multiprocessing
+import os
+import sys
+
+import lreq
+import torch
+import torch.multiprocessing as mp
+import torchvision
+from checkpointer import Checkpointer
+from defaults import get_cfg_defaults
+from dlutils.pytorch import count_parameters
+from model import Model
+from net import *
+from PIL import Image
+from torch import distributed
+
+lreq.use_implicit_lreq.set(True)
+
+indices = [4]
+
+labels = ["young"]
+
+
+def sample(cfg, logger, filenames, result_path, delta, result_num):
+    print(filenames)
+    torch.cuda.set_device(0)
+    model = Model(
+        startf=cfg.MODEL.START_CHANNEL_COUNT,
+        layer_count=cfg.MODEL.LAYER_COUNT,
+        maxf=cfg.MODEL.MAX_CHANNEL_COUNT,
+        latent_size=cfg.MODEL.LATENT_SPACE_SIZE,
+        truncation_psi=cfg.MODEL.TRUNCATIOM_PSI,
+        truncation_cutoff=cfg.MODEL.TRUNCATIOM_CUTOFF,
+        mapping_layers=cfg.MODEL.MAPPING_LAYERS,
+        channels=cfg.MODEL.CHANNELS,
+        generator=cfg.MODEL.GENERATOR,
+        encoder=cfg.MODEL.ENCODER,
+    )
+    model.cuda(0)
+    model.eval()
+    model.requires_grad_(False)
+
+    decoder = model.decoder
+    encoder = model.encoder
+    mapping_tl = model.mapping_d
+    mapping_fl = model.mapping_f
+    dlatent_avg = model.dlatent_avg
+
+    logger.info("Trainable parameters generator:")
+    count_parameters(decoder)
+
+    logger.info("Trainable parameters discriminator:")
+    count_parameters(encoder)
+
+    arguments = dict()
+    arguments["iteration"] = 0
+
+    model_dict = {
+        "discriminator_s": encoder,
+        "generator_s": decoder,
+        "mapping_tl_s": mapping_tl,
+        "mapping_fl_s": mapping_fl,
+        "dlatent_avg": dlatent_avg,
+    }
+
+    checkpointer = Checkpointer(cfg, model_dict, {}, logger=logger, save=False)
+
+    checkpointer.load()
+
+    model.eval()
+
+    layer_count = cfg.MODEL.LAYER_COUNT
+
+    def encode(x):
+        Z, _ = model.encode(x, layer_count - 1, 1)
+        Z = Z.repeat(1, model.mapping_f.num_layers, 1)
+        return Z
+
+    def decode(x):
+        layer_idx = torch.arange(2 * layer_count)[np.newaxis, :, np.newaxis]
+        ones = torch.ones(layer_idx.shape, dtype=torch.float32)
+        coefs = torch.where(layer_idx < model.truncation_cutoff, ones, ones)
+        x = torch.lerp(model.dlatent_avg.buff.data, x, coefs)
+        return model.decoder(x, layer_count - 1, 1, noise=True)
+
+    attribute_values = [0.0 for i in indices]
+    if result_path == "":
+        print("Error: result_path not set")
+
+    W = [
+        torch.tensor(
+            np.load("principal_directions/direction_%d.npy" % i), dtype=torch.float32
+        )
+        for i in indices
+    ]
+
+    rnd = np.random.RandomState(5)
+
+    def loadImage(filename):
+        img = np.asarray(Image.open(filename))
+
+        if img.shape[2] == 4:
+            img = img[:, :, :3]
+        im = img.transpose((2, 0, 1))
+        x = (
+            torch.tensor(
+                np.asarray(im, dtype=np.float32), device="cpu", requires_grad=True
+            ).cuda()
+            / 127.5
+            - 1.0
+        )
+        if x.shape[0] == 4:
+            x = x[:3]
+
+        needed_resolution = model.decoder.layer_to_resolution[-1]
+        while x.shape[2] > needed_resolution:
+            x = F.avg_pool2d(x, 2, 2)
+        if x.shape[2] != needed_resolution:
+            x = F.adaptive_avg_pool2d(x, (needed_resolution, needed_resolution))
+
+        img_src = (
+            ((x * 0.5 + 0.5) * 255)
+            .type(torch.long)
+            .clamp(0, 255)
+            .cpu()
+            .type(torch.uint8)
+            .transpose(0, 2)
+            .transpose(0, 1)
+            .numpy()
+        )
+
+        latents_original = encode(x[None, ...].cuda())
+        latents = latents_original[0, 0].clone()
+        latents -= model.dlatent_avg.buff.data[0]
+
+        for v, w in zip(attribute_values, W):
+            v = (latents * w).sum()
+
+        for v, w in zip(attribute_values, W):
+            latents = latents - v * w
+
+        return latents, latents_original, img_src
+
+    def update_image(w, latents_original):
+        with torch.no_grad():
+            w = w + model.dlatent_avg.buff.data[0]
+            w = w[None, None, ...].repeat(1, model.mapping_f.num_layers, 1)
+
+            layer_idx = torch.arange(model.mapping_f.num_layers)[
+                np.newaxis, :, np.newaxis
+            ]
+            cur_layers = (7 + 1) * 2
+            mixing_cutoff = cur_layers
+            styles = torch.where(layer_idx < mixing_cutoff, w, latents_original)
+
+            x_rec = decode(styles)
+            resultsample = ((x_rec * 0.5 + 0.5) * 255).type(torch.long).clamp(0, 255)
+            resultsample = resultsample.cpu()[0, :, :, :]
+            return resultsample.type(torch.uint8).transpose(0, 2).transpose(0, 1)
+
+    result = []
+    if not os.path.exists(result_path):
+        os.mkdir(result_path)
+    for filename in filenames:
+        latents, latents_original, img_src = loadImage(filename)
+
+        im_size = 2 ** (cfg.MODEL.LAYER_COUNT + 1)
+        im = update_image(latents, latents_original)
+
+        for i in range(result_num):
+            for x in range(len(attribute_values)):
+                attribute_values[x] += delta
+            new_latents = latents + sum([v * w for v, w in zip(attribute_values, W)])
+
+            im = update_image(new_latents, latents_original)
+
+            new_im = torchvision.transforms.functional.to_pil_image(im.permute(2, 0, 1))
+
+            new_im.save(
+                f"{result_path}/{'.'.join(filename.split('/')[-1].split('.')[:-1])}_var{i}.png"
+            )
+            result.append(
+                f"{result_path}/{'.'.join(filename.split('/')[-1].split('.')[:-1])}_var{i}.png"
+            )
+    print(result)
+    return result
+
+
+def setup(rank, world_size):
+    os.environ["MASTER_ADDR"] = "localhost"
+    os.environ["MASTER_PORT"] = "12355"
+    distributed.init_process_group("nccl", rank=rank, world_size=world_size)
+
+
+def cleanup():
+    distributed.destroy_process_group()
+
+
+def _run(rank, world_size, fn, defaults, write_log, no_cuda, args):
+    if world_size > 1:
+        setup(rank, world_size)
+    if not no_cuda:
+        torch.cuda.set_device(rank)
+
+    cfg = defaults
+    config_file = args.config_file
+    if len(os.path.splitext(config_file)[1]) == 0:
+        config_file += ".yaml"
+    if not os.path.exists(config_file) and os.path.exists(
+        os.path.join("configs", config_file)
+    ):
+        config_file = os.path.join("configs", config_file)
+    cfg.merge_from_file(config_file)
+    cfg.merge_from_list(args.opts)
+    cfg.freeze()
+
+    logger = logging.getLogger("logger")
+    logger.setLevel(logging.DEBUG)
+
+    output_dir = cfg.OUTPUT_DIR
+    os.makedirs(output_dir, exist_ok=True)
+
+    if rank == 0:
+        ch = logging.StreamHandler(stream=sys.stdout)
+        ch.setLevel(logging.DEBUG)
+        formatter = logging.Formatter("%(asctime)s %(name)s %(levelname)s: %(message)s")
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
+
+        if write_log:
+            filepath = os.path.join(output_dir, "log.txt")
+            if isinstance(write_log, str):
+                filepath = write_log
+            fh = logging.FileHandler(filepath)
+            fh.setLevel(logging.DEBUG)
+            fh.setFormatter(formatter)
+            logger.addHandler(fh)
+
+    logger.info(args)
+
+    logger.info("World size: {}".format(world_size))
+
+    logger.info("Loaded configuration file {}".format(config_file))
+    with open(config_file, "r") as cf:
+        config_str = "\n" + cf.read()
+        logger.info(config_str)
+    logger.info("Running with config:\n{}".format(cfg))
+
+    if not no_cuda:
+        torch.set_default_tensor_type("torch.cuda.FloatTensor")
+        device = torch.cuda.current_device()
+        print("Running on ", torch.cuda.get_device_name(device))
+
+    args.distributed = world_size > 1
+    args_to_pass = dict(
+        cfg=cfg,
+        logger=logger,
+        local_rank=rank,
+        world_size=world_size,
+        distributed=args.distributed,
+        filenames=args.filenames,
+        result_path=args.output,
+        delta=args.delta,
+        result_num=args.num,
+    )
+    signature = inspect.signature(fn)
+    matching_args = {}
+    for key in args_to_pass.keys():
+        if key in signature.parameters.keys():
+            matching_args[key] = args_to_pass[key]
+    fn(**matching_args)
+
+    if world_size > 1:
+        cleanup()
+
+
+def run(
+    fn,
+    defaults,
+    description="",
+    default_config="configs/experiment.yaml",
+    world_size=1,
+    write_log=True,
+    no_cuda=False,
+):
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument(
+        "-c",
+        "--config-file",
+        default=default_config,
+        help="path to config file",
+        type=str,
+    )
+    parser.add_argument(
+        "-f",
+        "--filenames",
+        help="Path of input images",
+        nargs="+",
+        default=[],
+    )
+
+    parser.add_argument(
+        "--output", "-o", type=str, help="Path to the output directory", default=""
+    )
+
+    parser.add_argument(
+        "--num", "-n", type=int, default=5, help="Number of output files"
+    )
+    parser.add_argument(
+        "--delta", "-d", type=int, default=-4, help="degree of output changes"
+    )
+
+    parser.add_argument(
+        "opts",
+        help="Modify config options using the command-line",
+        default=None,
+        nargs=argparse.REMAINDER,
+    )
+
+    cpu_count = multiprocessing.cpu_count()
+    os.environ["OMP_NUM_THREADS"] = str(max(1, int(cpu_count / world_size)))
+
+    args = parser.parse_args()
+
+    if world_size > 1:
+        mp.spawn(
+            _run,
+            args=(world_size, fn, defaults, write_log, no_cuda, args),
+            nprocs=world_size,
+            join=True,
+        )
+    else:
+        _run(0, world_size, fn, defaults, write_log, no_cuda, args)
+
+
+if __name__ == "__main__":
+    gpu_count = 1
+    run(
+        sample,
+        get_cfg_defaults(),
+        description="make people older",
+        default_config="configs/ffhq.yaml",
+        world_size=gpu_count,
+        write_log=False,
+    )
