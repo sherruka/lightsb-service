@@ -1,3 +1,5 @@
+from typing import Union
+
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
@@ -23,7 +25,7 @@ class UserProfileRepository:
         return new_profile
 
     @staticmethod
-    def get_user_profile(db: Session, user_id: str) -> UserProfileDB | None:
+    def get_user_profile(db: Session, user_id: str) -> Union[UserProfileDB, None]:
         # Получаем профиль пользователя по user_id
         return db.query(UserProfileDB).filter(UserProfileDB.user_id == user_id).first()
 

@@ -6,5 +6,4 @@ docker compose \
     --env-file ./env/.env.minio \
     --env-file ./env/.env.backend down
 
-sudo rm -rf app/__pycache__  app/resources/__pycache__  app/database/__pycache__ app/auth/__pycache__ \
-    tests/__pycache__  tests/.pytest_cache
+sudo find . -type d -name "__pycache__" -exec rm -r {} +

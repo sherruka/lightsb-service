@@ -225,11 +225,19 @@ def sample(cfg, logger):
 
                         ims = resize(
                             ims,
-                            (3, initial_resolution / 2**i, initial_resolution / 2**i),
+                            (
+                                3,
+                                initial_resolution / 2**i,
+                                initial_resolution / 2**i,
+                            ),
                         )
                         imr = resize(
                             imr,
-                            (3, initial_resolution / 2**i, initial_resolution / 2**i),
+                            (
+                                3,
+                                initial_resolution / 2**i,
+                                initial_resolution / 2**i,
+                            ),
                         )
 
                         place(

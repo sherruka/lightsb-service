@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List, Union
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
@@ -43,22 +44,22 @@ class UserRepository:
         return new_user
 
     @staticmethod
-    def get_user(db: Session, user_id: str) -> UserDB | None:
+    def get_user(db: Session, user_id: str) -> Union[UserDB, None]:
         # Получаем пользователя по user_id
         return db.query(UserDB).filter(UserDB.user_id == user_id).first()
 
     @staticmethod
-    def get_user_by_email(db: Session, email: str) -> UserDB | None:
+    def get_user_by_email(db: Session, email: str) -> Union[UserDB, None]:
         # Получаем пользователя по email
         return db.query(UserDB).filter(UserDB.email == email).first()
 
     @staticmethod
-    def get_user_by_username(db: Session, username: str) -> UserDB | None:
+    def get_user_by_username(db: Session, username: str) -> Union[UserDB, None]:
         # Получаем пользователя по username
         return db.query(UserDB).filter(UserDB.username == username).first()
 
     @staticmethod
-    def get_users(db: Session) -> list[UserDB]:
+    def get_users(db: Session) -> List[UserDB]:
         # Получаем всех пользователей
         return db.query(UserDB).all()
 

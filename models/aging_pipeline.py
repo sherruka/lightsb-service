@@ -1,20 +1,11 @@
-import ast
 import os.path
-import subprocess
 
-from head_detection import head_detector
 from ultralytics import YOLO
 
+from models.generator import generate
+from models.head_detection import head_detector
+
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
-
-
-def execute_process(command, cwd):
-    p = subprocess.Popen(
-        command, cwd=cwd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    p.wait()
-    stdout, stderr = p.communicate()
-    return stdout
 
 
 def aging_pipeline(
@@ -24,17 +15,20 @@ def aging_pipeline(
         filenames = [filenames]
 
     filenames = [os.path.abspath(filename) for filename in filenames]
+    output_path = os.path.abspath(output_path)
+    checkpoint_path = f"{SCRIPT_PATH}/yolov11n_weights.pt"
 
-    model = YOLO("yolov11n_weights.pt")
+    model = YOLO(checkpoint_path)
     hd_model = head_detector(model)
     detected_heads = hd_model.predict(filenames)
-
-    output_path = os.path.abspath(output_path)
-
-    aged_people = execute_process(
-        f"python ./generator.py --filenames {' '.join(detected_heads)} --output {output_path} --num {result_count} --delta {delta}",
-        f"{SCRIPT_PATH}/LightSB/ALAE",
-    )
-    aged_people = aged_people.decode().split("\n")[-2]
-    aged_people = ast.literal_eval(aged_people)
+    if len(detected_heads) == 0:
+        print("no heads was detected on given image")
+        return []
+    aged_people = generate(detected_heads, output_path, result_count, delta)
     return aged_people
+
+
+if __name__ == "__main__":
+    # for testing purposes
+    ret = aging_pipeline("./dataset_samples/faces/realign1024x1024/00152.png")
+    print(ret)

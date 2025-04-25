@@ -19,6 +19,8 @@ import torch
 import utils
 from torch import nn
 
+SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
+
 
 def get_model_dict(x):
     if x is None:
@@ -68,10 +70,11 @@ class Checkpointer(object):
         return save_data()
 
     def load(self, ignore_last_checkpoint=False, file_name=None):
-        save_file = os.path.join(self.cfg.OUTPUT_DIR, "last_checkpoint")
+        output_dir = os.path.join(str(SCRIPT_PATH), self.cfg.OUTPUT_DIR)
+        save_file = os.path.join(output_dir, "last_checkpoint")
         try:
             with open(save_file, "r") as last_checkpoint:
-                f = last_checkpoint.read().strip()
+                f = os.path.join(SCRIPT_PATH, last_checkpoint.read().strip())
         except IOError:
             self.logger.info("No checkpoint found. Initializing model from scratch")
             if file_name is None:
