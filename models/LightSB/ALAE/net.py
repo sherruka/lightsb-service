@@ -848,7 +848,7 @@ def minibatch_stddev_layer(x, group_size=4):
         x = torch.cat([x, x[: (group_size - (x.shape[0] % group_size)) % group_size]])
     y = x.view(group_size, -1, x.shape[1], x.shape[2], x.shape[3])
     y = y - y.mean(dim=0, keepdim=True)
-    y = torch.sqrt((y ** 2).mean(dim=0) + 1e-8).mean(dim=[1, 2, 3], keepdim=True)
+    y = torch.sqrt((y**2).mean(dim=0) + 1e-8).mean(dim=[1, 2, 3], keepdim=True)
     y = y.repeat(group_size, 1, x.shape[2], x.shape[3])
     return torch.cat([x, y], dim=1)[:size]
 
