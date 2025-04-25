@@ -18,7 +18,6 @@ from model import Model
 from net import *
 from PIL import Image
 
-
 lreq.use_implicit_lreq.set(True)
 
 indices = [4]

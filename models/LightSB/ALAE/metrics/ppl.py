@@ -146,12 +146,15 @@ class PPL:
             # Evaluate perceptual distance.
             img_e0, img_e1 = images[0::2], images[1::2]
 
-            res = distance_measure.run(
-                img_e0.cpu().numpy(),
-                img_e1.cpu().numpy(),
-                num_gpus=gpu_count,
-                assume_frozen=True,
-            ) * (1 / self.epsilon**2)
+            res = (
+                distance_measure.run(
+                    img_e0.cpu().numpy(),
+                    img_e1.cpu().numpy(),
+                    num_gpus=gpu_count,
+                    assume_frozen=True,
+                )
+                * (1 / self.epsilon ** 2)
+            )
 
             all_distances.append(res)
 

@@ -1,0 +1,10 @@
+fastapi[all]
+uvicorn
+sqlalchemy
+psycopg2-binary
+pydantic
+bcrypt==4.0.1
+jwt
+passlib
+python-jose
+pytest

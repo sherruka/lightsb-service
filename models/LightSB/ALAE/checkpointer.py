@@ -18,7 +18,6 @@ import os
 import torch
 import utils
 from torch import nn
-import os
 
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 

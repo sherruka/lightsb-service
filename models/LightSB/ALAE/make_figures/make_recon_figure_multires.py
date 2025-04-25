@@ -213,23 +213,31 @@ def sample(cfg, logger):
         height_padding = 0
 
         for i in range(lods_down + 1):
-            for x in range(2**i):
-                for y in range(2**i):
+            for x in range(2 ** i):
+                for y in range(2 ** i):
                     try:
                         ims = src.pop()
                         imr = rec.pop()[0]
                         ims = ims.cpu().detach().numpy()
                         imr = imr
 
-                        res = int(initial_resolution / 2**i)
+                        res = int(initial_resolution / 2 ** i)
 
                         ims = resize(
                             ims,
-                            (3, initial_resolution / 2**i, initial_resolution / 2**i),
+                            (
+                                3,
+                                initial_resolution / 2 ** i,
+                                initial_resolution / 2 ** i,
+                            ),
                         )
                         imr = resize(
                             imr,
-                            (3, initial_resolution / 2**i, initial_resolution / 2**i),
+                            (
+                                3,
+                                initial_resolution / 2 ** i,
+                                initial_resolution / 2 ** i,
+                            ),
                         )
 
                         place(

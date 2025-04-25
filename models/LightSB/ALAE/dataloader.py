@@ -79,7 +79,7 @@ class TFRecordsDataset:
                 files.append(file)
             self.filenames[r] = files
 
-        self.buffer_size_b = 1024**2 * buffer_size_mb
+        self.buffer_size_b = 1024 ** 2 * buffer_size_mb
 
         self.current_filenames = []
 
@@ -88,7 +88,7 @@ class TFRecordsDataset:
         self.current_filenames = self.filenames[lod]
         self.batch_size = batch_size
 
-        img_size = 2**lod
+        img_size = 2 ** lod
 
         if self.needs_labels:
             self.features = {
@@ -253,7 +253,7 @@ class TFRecordsDatasetImageNet:
                 files.append(file)
             self.filenames[r] = files
 
-        self.buffer_size_b = 1024**2 * buffer_size_mb
+        self.buffer_size_b = 1024 ** 2 * buffer_size_mb
 
         self.current_filenames = []
 
@@ -263,9 +263,9 @@ class TFRecordsDatasetImageNet:
         self.batch_size = batch_size
 
         if self.train:
-            img_size = 2**lod + 2 ** (lod - 3)
+            img_size = 2 ** lod + 2 ** (lod - 3)
         else:
-            img_size = 2**lod
+            img_size = 2 ** lod
 
         if self.needs_labels:
             self.features = {
@@ -311,7 +311,7 @@ def make_imagenet_dataloader(
             self.flip = cfg.DATASET.FLIP_IMAGES
             self.size = target_size
             p = math.log2(target_size)
-            self.source_size = 2**p + 2 ** (p - 3)
+            self.source_size = 2 ** p + 2 ** (p - 3)
             self.do_random_crops = do_random_crops
 
         def __call__(self, batch):
@@ -364,7 +364,7 @@ def make_imagenet_dataloader_y(
             self.flip = cfg.DATASET.FLIP_IMAGES
             self.size = target_size
             p = math.log2(target_size)
-            self.source_size = 2**p + 2 ** (p - 3)
+            self.source_size = 2 ** p + 2 ** (p - 3)
             self.do_random_crops = do_random_crops
 
         def __call__(self, batch):

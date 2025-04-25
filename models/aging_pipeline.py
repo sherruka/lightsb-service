@@ -1,8 +1,9 @@
 import os.path
 
-from head_detection import head_detector
 from ultralytics import YOLO
-from generator import generate
+
+from models.generator import generate
+from models.head_detection import head_detector
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
