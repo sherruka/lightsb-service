@@ -22,9 +22,6 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install black isort
-      
-      - name: Check black version
-        run: black --version
 
       - name: Run isort
         run: isort --check-only --diff .

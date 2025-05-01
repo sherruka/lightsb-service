@@ -23,7 +23,7 @@ def aging_pipeline(
     detected_heads = hd_model.predict(filenames)
     if len(detected_heads) == 0:
         print("no heads was detected on given image")
-        return []
+        return ["no heads was detected on given image"]
     aged_people = generate(detected_heads, output_path, result_count, delta)
     return aged_people
 

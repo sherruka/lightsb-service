@@ -326,6 +326,65 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     async function initGeneratorPage() {
-        let isAuthenticated = await updateAuthUI();
+        await updateAuthUI();
+
+        const form = document.getElementById("generator-form");
+        const imageInput = document.getElementById("image-upload");
+        const loadingText = document.getElementById("loading-text");
+        const generatedImagesContainer = document.getElementById("generated-images");
+
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            if (!imageInput.files.length) {
+                alert("Please upload an image first.");
+                return;
+            }
+
+            loadingText.style.display = "block";
+            generatedImagesContainer.style.display = "none";
+            generatedImagesContainer.innerHTML = "";
+
+            const formData = new FormData();
+            formData.append("file", imageInput.files[0]);
+
+            try {
+                const response = await fetch("/api/generate", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                console.log("Result:", result);
+
+                if (result.image_urls.length === 1) {
+                    loadingText.style.display = "none";
+                    alert("No heads was detected on given image.");
+                } else {
+                    loadingText.style.display = "none";
+                    generatedImagesContainer.style.display = "block";
+                    
+                    const timestamp = Date.now(); 
+                    
+                    result.image_urls.forEach((url) => {
+                        const img = document.createElement("img");
+                        img.src = `${url}?t=${timestamp}`;
+                        img.alt = "Generated Image";
+                        img.classList.add("generated-image");
+                        generatedImagesContainer.appendChild(img);
+                    });
+                }
+            } catch (error) {
+                console.error("Error during image processing:", error);
+                loadingText.style.display = "none";
+                alert("An error occurred while processing your image. Please try again.");
+            }
+        });
+
     }
 });

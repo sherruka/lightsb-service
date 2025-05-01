@@ -89,3 +89,11 @@ class NoRefreshTokenError(HTTPException):
         super().__init__(
             status_code=HTTPStatus.UNAUTHORIZED, detail="No refresh token provided"
         )
+
+
+class NoGeneratedImagesError(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail="Failed to generate images.",
+        )
