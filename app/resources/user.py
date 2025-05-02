@@ -1,3 +1,4 @@
+import copy
 import logging
 import os
 import shutil
@@ -36,6 +37,7 @@ from app.exceptions import (
     UserProfileNotFoundError,
     UserProfileUpdateError,
     UserStatsNotFoundError,
+    UserStatsUpdateError,
 )
 from app.resources.schemas import (
     User,
@@ -45,6 +47,7 @@ from app.resources.schemas import (
     UserProfileUpdate,
     UserRegister,
     UserStats,
+    UserStatsUpdate,
 )
 from models.aging_pipeline import aging_pipeline
 
@@ -229,6 +232,40 @@ def get_stats(
         "last_used": stats.last_used,
         "avg_usage_time": stats.avg_usage_time,
     }
+
+
+# Обновление статистики
+@router.post("/stats/update", status_code=status.HTTP_200_OK)
+def update_stats(
+    request: UserStatsUpdate,
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(get_user_by_token),
+):
+    stats = user_stats_repo.get_user_stats(db, current_user.user_id)
+
+    if not stats:
+        raise UserStatsNotFoundError()
+
+    stats_update = copy.copy(stats)
+
+    if not stats.avg_usage_time:
+        stats_update.avg_usage_time = request.avg_usage_time
+    else:
+        stats_update.avg_usage_time = (
+            stats.avg_usage_time * stats.usage_count + request.avg_usage_time
+        ) / (stats.usage_count + request.usage_count)
+    stats_update.usage_count += request.usage_count
+    stats_update.images_count += request.images_count
+    stats_update.last_used = request.last_used
+    updated_stats = user_stats_repo.update_user_stats(db, stats, stats_update)
+
+    if not updated_stats:
+        raise UserStatsUpdateError()
+
+    return JSONResponse(
+        content={},
+        status_code=200,
+    )
 
 
 @router.post("/generate", response_model=UserStats)

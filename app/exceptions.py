@@ -51,6 +51,12 @@ class UserProfileUpdateError(HTTPException):
         self.detail = "Failed to update profile."
 
 
+class UserStatsUpdateError(HTTPException):
+    def __init__(self):
+        self.status_code = HTTPStatus.INTERNAL_SERVER_ERROR
+        self.detail = "Failed to update stats."
+
+
 class IncorrectPasswordError(HTTPException):
     def __init__(self):
         self.status_code = HTTPStatus.UNAUTHORIZED
