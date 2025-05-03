@@ -1,13 +1,12 @@
 FROM python:3.8-slim
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends libpq-dev libgl1 libglib2.0-0 && \
-    rm -rf /var/lib/apt/lists/*
-
 COPY ./models/LightSB/ALAE/requirements.txt ./models/LightSB/ALAE/requirements.txt
 COPY ./app/requirements.txt  ./app/requirements.txt 
 
-RUN pip install --upgrade pip && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libpq-dev libgl1 libglib2.0-0 && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install --upgrade pip && \
     pip install --no-cache-dir -r app/requirements.txt -r models/LightSB/ALAE/requirements.txt && \
     JACOBIAN_PATH=$(find /usr/local/lib/python3.8/site-packages/dlutils -name jacobian.py) && \
     sed -i '/from torch\.autograd\.gradcheck import zero_gradients/d' "$JACOBIAN_PATH" && \

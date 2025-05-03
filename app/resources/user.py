@@ -1,6 +1,22 @@
+import copy
+import logging
+import os
+import shutil
+import tempfile
 from datetime import timedelta
+from pathlib import Path
+from urllib.parse import urlparse, urlunparse
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Request,
+    Response,
+    UploadFile,
+    status,
+)
 from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -14,12 +30,14 @@ from app.database.user_stat_db import user_stats_repo
 from app.exceptions import (
     DuplicateUserError,
     IncorrectPasswordError,
+    NoGeneratedImagesError,
     NoRefreshTokenError,
     PasswordsDoNotMatchError,
     UserNotFoundError,
     UserProfileNotFoundError,
     UserProfileUpdateError,
     UserStatsNotFoundError,
+    UserStatsUpdateError,
 )
 from app.resources.schemas import (
     User,
@@ -29,7 +47,9 @@ from app.resources.schemas import (
     UserProfileUpdate,
     UserRegister,
     UserStats,
+    UserStatsUpdate,
 )
+from models.aging_pipeline import aging_pipeline
 
 router = APIRouter(tags=["auth"])
 
@@ -212,3 +232,70 @@ def get_stats(
         "last_used": stats.last_used,
         "avg_usage_time": stats.avg_usage_time,
     }
+
+
+# Обновление статистики
+@router.post("/stats/update", status_code=status.HTTP_200_OK)
+def update_stats(
+    request: UserStatsUpdate,
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(get_user_by_token),
+):
+    stats = user_stats_repo.get_user_stats(db, current_user.user_id)
+
+    if not stats:
+        raise UserStatsNotFoundError()
+
+    stats_update = copy.copy(stats)
+
+    if not stats.avg_usage_time:
+        stats_update.avg_usage_time = request.avg_usage_time
+    else:
+        stats_update.avg_usage_time = (
+            stats.avg_usage_time * stats.usage_count + request.avg_usage_time
+        ) / (stats.usage_count + request.usage_count)
+    stats_update.usage_count += request.usage_count
+    stats_update.images_count += request.images_count
+    stats_update.last_used = request.last_used
+    updated_stats = user_stats_repo.update_user_stats(db, stats, stats_update)
+
+    if not updated_stats:
+        raise UserStatsUpdateError()
+
+    return JSONResponse(
+        content={},
+        status_code=200,
+    )
+
+
+@router.post("/generate", response_model=UserStats)
+async def generate_images(file: UploadFile = File(...)):
+
+    try:
+        folder_path_generated = "app/static/generated"
+
+        shutil.rmtree(folder_path_generated, ignore_errors=True)
+        os.makedirs(folder_path_generated, exist_ok=True)
+
+        original_extension = Path(file.filename).suffix.lower() or ".jpg"
+        input_filename = f"input_img{original_extension}"
+
+        input_path = os.path.join(folder_path_generated, input_filename)
+
+        image_data = await file.read()
+        with open(input_path, "wb") as f:
+            f.write(image_data)
+
+        output_dir = os.path.join(folder_path_generated)
+        generated_images = aging_pipeline(input_path, output_dir)
+        if not generated_images:
+            raise NoGeneratedImagesError
+        elif len(generated_images) == 1:
+            return JSONResponse(content={"image_urls": generated_images})
+
+        clean_paths = [path.replace("app/", "", 1) for path in generated_images]
+
+        return JSONResponse(content={"image_urls": clean_paths})
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")

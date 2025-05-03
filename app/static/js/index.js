@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 document.querySelectorAll(".Stat-item .Stat-value")[0].textContent = data.usage_count;
                 document.querySelectorAll(".Stat-item .Stat-value")[1].textContent = data.images_count;
                 document.querySelectorAll(".Stat-item .Stat-value")[2].textContent = formatDate(data.last_used);
-                document.querySelectorAll(".Stat-item .Stat-value")[3].textContent = formatTime(data.avg_usage_time);
+                document.querySelectorAll(".Stat-item .Stat-value")[3].textContent = formatTime(data.avg_usage_time / 1000);
 
             } catch (error) {
                 console.error("Error loading stats:", error);
@@ -326,6 +326,125 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     async function initGeneratorPage() {
-        let isAuthenticated = await updateAuthUI();
+        await updateAuthUI();
+
+        const form = document.getElementById("generator-form");
+        const imageInput = document.getElementById("image-upload");
+        const loadingText = document.getElementById("loading-text");
+        const generatedImagesContainer = document.getElementById("generated-images");
+
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            if (!imageInput.files.length) {
+                alert("Please upload an image first.");
+                return;
+            }
+
+            loadingText.style.display = "block";
+            generatedImagesContainer.style.display = "none";
+            generatedImagesContainer.innerHTML = "";
+
+            const timeStartUse = new Date().toISOString();
+            let requestDurationSeconds = 0;
+
+            const formData = new FormData();
+            formData.append("file", imageInput.files[0]);
+
+            let f = 0;
+            let len = 0;
+
+            try {
+                const startTime = performance.now();
+
+                const response = await fetch("/api/generate", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const endTime = performance.now(); 
+                requestDurationSeconds = (endTime - startTime); 
+                console.log("Result:", requestDurationSeconds);
+
+                if (!response.ok) {
+                    throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                len = result.image_urls.length;
+
+                if (result.image_urls.length === 1) {
+                    loadingText.style.display = "none";
+                    alert("No heads was detected on given image.");
+                } else {
+                    loadingText.style.display = "none";
+                    generatedImagesContainer.style.display = "block";
+                    
+                    const timestamp = Date.now(); 
+                    
+                    result.image_urls.forEach((url) => {
+                        const img = document.createElement("img");
+                        img.src = `${url}?t=${timestamp}`;
+                        img.alt = "Generated Image";
+                        img.classList.add("generated-image");
+                        generatedImagesContainer.appendChild(img);
+                    });
+                    f=1
+                }
+            } catch (error) {
+                console.error("Error during image processing:", error);
+                loadingText.style.display = "none";
+                alert("An error occurred while processing your image. Please try again.");
+            }
+            
+            if (f) {
+                const formObject = {};
+                formObject.usage_count = 1
+                formObject.images_count = len
+                formObject.last_used = timeStartUse
+                formObject.avg_usage_time = requestDurationSeconds
+
+
+                async function sendStatsUpdate(token) {
+                    return fetch("/api/stats/update", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                            "Authorization": `Bearer ${token}`,
+                        },
+                        body: JSON.stringify(formObject),
+                    });
+                }
+
+                let accessToken = sessionStorage.getItem("access_token_lightsb");
+                let response = await sendStatsUpdate(accessToken);
+
+                if (response.status === 401) {  // Token expired
+                    const newAccessToken = await refreshAccessToken();
+
+                    if (newAccessToken) {
+                        // Retry request with new token
+                        response = await sendStatsUpdate(newAccessToken);
+                    } else {
+                        alert("Session expired, please log in again.");
+                        window.location.href = "/pages/login";
+                    }
+                }
+
+                try {
+                    let result = await response.json();
+                    if (!response.ok) {
+                        alert(result.detail || "Update failed");
+                    }
+                } catch (error) {
+                    console.error("Error processing the response:", error);
+                    alert("Server error. Try again later.");
+                }
+            }
+        });
+
     }
 });

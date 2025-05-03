@@ -39,7 +39,7 @@ jobs:
           -subj "/C=RU/ST=Nizhny Novgorod Oblast/L=Nizhny Novgorod/O=Higher School of Economics NN/OU=/CN=localhost"
 
       - name: Build images
-        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.backend.yaml -f ./docker/docker-compose.nginx.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend up --build -d
+        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.nginx.yaml -f ./docker/docker-compose.postgres.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend up --build -d
 
       - name: Check running containers
         run: docker ps -a
@@ -89,4 +89,4 @@ jobs:
           docker logs fastapi || true
           
       - name: Stop and remove containers
-        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.backend.yaml -f ./docker/docker-compose.nginx.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend down
+        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.nginx.yaml -f ./docker/docker-compose.postgres.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend down
