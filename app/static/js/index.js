@@ -330,7 +330,72 @@ document.addEventListener("DOMContentLoaded", async () => {
     const form = document.getElementById("generator-form")
     const imageInput = document.getElementById("image-upload")
     const loadingText = document.getElementById("loading-text")
+    const resultHeader = document.querySelector(".result-header")
     const generatedImagesContainer = document.getElementById("generated-images")
+    const downloadAllBtn = document.getElementById("download-all-btn")
+
+    // Store image URLs for download functionality
+    let generatedImageUrls = []
+
+    // Function to download a single image
+    async function downloadImage(url, filename) {
+      try {
+        const response = await fetch(url)
+        const blob = await response.blob()
+        const objectUrl = URL.createObjectURL(blob)
+
+        const link = document.createElement("a")
+        link.href = objectUrl
+        link.download = filename
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        // Clean up the object URL
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 100)
+      } catch (error) {
+        console.error("Error downloading image:", error)
+        alert("Failed to download image. Please try again.")
+      }
+    }
+
+    // Function to download all images
+    async function downloadAllImages() {
+      if (generatedImageUrls.length === 0) {
+        alert("No images to download.")
+        return
+      }
+
+      // Add a visual feedback that download is in progress
+      downloadAllBtn.textContent = "Downloading..."
+      downloadAllBtn.disabled = true
+
+      try {
+        // Download each image with a slight delay to prevent browser issues
+        for (let i = 0; i < generatedImageUrls.length; i++) {
+          const url = generatedImageUrls[i]
+          const filename = `generated-image-${i + 1}.png`
+
+          // Add a small delay between downloads
+          await new Promise((resolve) => setTimeout(resolve, 300))
+          await downloadImage(url, filename)
+        }
+
+        // Reset button state
+        downloadAllBtn.innerHTML = '<span class="download-icon">↓</span> Download All'
+        downloadAllBtn.disabled = false
+      } catch (error) {
+        console.error("Error in download process:", error)
+        downloadAllBtn.innerHTML = '<span class="download-icon">↓</span> Download All'
+        downloadAllBtn.disabled = false
+        alert("An error occurred during download. Please try again.")
+      }
+    }
+
+    // Add click event listener to download button
+    if (downloadAllBtn) {
+      downloadAllBtn.addEventListener("click", downloadAllImages)
+    }
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault()
@@ -340,8 +405,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         return
       }
 
-      // Show loading text
+      // Reset previous results
+      generatedImageUrls = []
+
+      // Show loading text and hide previous results
       loadingText.style.display = "block"
+      resultHeader.style.display = "none"
       generatedImagesContainer.style.display = "none"
       generatedImagesContainer.innerHTML = ""
 
@@ -380,6 +449,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (result.image_urls.length === 1) {
           alert("No heads were detected in the given image.")
         } else {
+          // Store image URLs for download functionality
+          generatedImageUrls = [...result.image_urls]
+
+          // Show result header and images container
+          resultHeader.style.display = "flex"
           generatedImagesContainer.style.display = "grid"
 
           const timestamp = Date.now()
@@ -412,6 +486,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } catch (error) {
         console.error("Error during image processing:", error)
         loadingText.style.display = "none"
+        resultHeader.style.display = "none"
         alert("An error occurred while processing your image. Please try again.")
       }
 
