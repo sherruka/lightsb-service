@@ -6,9 +6,9 @@ body {
     width: 100%;
     height: 100vh;
     overflow: auto;
-}
-
-.Menu {
+  }
+  
+  .Menu {
     width: 20%;
     height: 100vh;
     background: #3d3d3d;
@@ -16,18 +16,18 @@ body {
     flex-direction: column;
     align-items: flex-start;
     box-sizing: border-box;
-}
-
-.LightSB {
-    font-family: 'BhuTuka Expanded One', cursive;
+  }
+  
+  .LightSB {
+    font-family: "BhuTuka Expanded One", cursive;
     font-size: 4rem;
     margin: 1.5rem 0;
     text-align: center;
     color: #fff;
     width: 100%;
-}
-
-.Menu-item {
+  }
+  
+  .Menu-item {
     width: 100%;
     height: 70px;
     display: flex;
@@ -37,40 +37,41 @@ body {
     background: #3d3d3d;
     cursor: pointer;
     transition: background 0.3s ease;
-}
-
-.Menu-item img {
+  }
+  
+  .Menu-item img {
     width: 50px;
     height: 50px;
     object-fit: contain;
-}
-
-.Menu-item span {
-    font-family: 'Numans', sans-serif;
+  }
+  
+  .Menu-item span {
+    font-family: "Numans", sans-serif;
     font-size: 1.875rem;
     font-weight: 400;
     letter-spacing: 0.5px;
     color: #bdbdbd;
     margin-left: 20px;
-}
-
-.Menu-item.active {
+  }
+  
+  .Menu-item.active {
     background: #525252;
-}
-
-.Menu-item .authorized, .Menu-item .unauthorized {
+  }
+  
+  .Menu-item .authorized,
+  .Menu-item .unauthorized {
     min-width: 0;
-}
-
-.Menu-item .Profile-txt {
+  }
+  
+  .Menu-item .Profile-txt {
     display: block;
     max-width: calc(100% - 20px);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-}
-
-.Profile {
+  }
+  
+  .Profile {
     position: relative;
     height: 119px;
     display: flex;
@@ -78,36 +79,37 @@ body {
     justify-content: center;
     gap: 5px;
     margin-top: auto;
-}
-
-.Profile .iconprofile {
+  }
+  
+  .Profile .iconprofile {
     width: 70px;
     height: 70px;
-}
-
-.Profile .Profile-txt {
+  }
+  
+  .Profile .Profile-txt {
     font-size: 3rem;
-}
-
-.Line, .Line-between {
+  }
+  
+  .Line,
+  .Line-between {
     width: 100%;
     height: 2px;
     margin: 10px 20px;
-}
-
-.Line {
+  }
+  
+  .Line {
     position: absolute;
     top: 0;
     left: 0;
     background: #989898;
     margin: 0;
-}
-
-.Line-between {
+  }
+  
+  .Line-between {
     background: #656565;
-}
-
-.Content-area {
+  }
+  
+  .Content-area {
     width: 80%;
     flex-grow: 1;
     padding: 20px;
@@ -119,63 +121,65 @@ body {
     font-size: 2rem;
     overflow-y: auto;
     box-sizing: border-box;
-}
-
-.Main-text, .Second-text {
-    font-family: 'Numans', sans-serif;
+  }
+  
+  .Main-text,
+  .Second-text {
+    font-family: "Numans", sans-serif;
     font-weight: normal;
     text-align: left;
     word-wrap: break-word;
     white-space: normal;
     width: 99%;
     box-sizing: border-box;
-}
-
-.Main-text {
+  }
+  
+  .Main-text {
     font-size: clamp(30px, 4vw, 50px);
     color: #bdbdbd;
     margin: 18px 0 5px 18px;
-}
-
-.Second-text {
+  }
+  
+  .Second-text {
     font-size: clamp(18px, 2.5vw, 25px);
     color: #989898;
     margin: 10px 0 0 20px;
-}
-
-.Student-info {
+  }
+  
+  .Student-info {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     margin-top: 20px;
     width: 100%;
     box-sizing: border-box;
-}
-
-.Link {
-    color: #14B8AE;
+  }
+  
+  .Link {
+    color: #14b8ae;
     text-decoration: none;
     transition: color 0.3s ease;
-}
-
-.Profile-content {
+  }
+  
+  .Profile-content {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     background-color: #292929;
     color: white;
     width: 90%;
-}
-
-.Profile-layout {
+  }
+  
+  .Profile-layout {
     display: flex;
     gap: 30px;
     width: 100%;
     margin-top: 25px;
     align-items: flex-start;
-}
-
-.User-info, .Usage-statistics {
+  }
+  
+  .User-info,
+  .Usage-statistics {
     background: #3d3d3d;
     padding: 20px;
     padding-top: 5px;
@@ -185,23 +189,26 @@ body {
     position: relative;
     white-space: normal;
     word-break: keep-all;
-}
-
-.Info-item, .Stat-item {
+  }
+  
+  .Info-item,
+  .Stat-item {
     display: flex;
     align-items: center;
     gap: 10px;
-}
-
-.Info-label, .Stat-label {
+  }
+  
+  .Info-label,
+  .Stat-label {
     font-size: 1.5rem;
     color: #989898;
     width: 150px;
     flex-shrink: 0;
-}
-
-.Info-value, .Stat-value {
-    font-family: 'Numans', sans-serif;
+  }
+  
+  .Info-value,
+  .Stat-value {
+    font-family: "Numans", sans-serif;
     font-size: 1.6rem;
     color: #bdbdbd;
     margin-left: 10px;
@@ -209,138 +216,140 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     flex-grow: 1;
-}
-
-.Info-item span, .Stat-item span {
+  }
+  
+  .Info-item span,
+  .Stat-item span {
     display: inline-block;
     margin-bottom: 8px;
-}
-
-.Info-item {
+  }
+  
+  .Info-item {
     display: flex;
     align-items: center;
-}
-
-.Stat-item {
+  }
+  
+  .Stat-item {
     display: flex;
     align-items: center;
-}
-
-.User-info h2, .Usage-statistics h2 {
-    font-family: 'Numans', sans-serif;
+  }
+  
+  .User-info h2,
+  .Usage-statistics h2 {
+    font-family: "Numans", sans-serif;
     font-size: 2rem;
     color: #bdbdbd;
     margin-bottom: 20px;
-}
-
-.Sub-title {
+  }
+  
+  .Sub-title {
     min-height: 10px;
     display: flex;
-    align-items: center; 
-}
-
-.auth-links {
+    align-items: center;
+  }
+  
+  .auth-links {
     position: absolute;
     top: 20px;
     right: 20px;
-    font-family: 'Numans', sans-serif;
+    font-family: "Numans", sans-serif;
     font-size: 1.5rem;
     color: #bdbdbd;
-}
-
-.auth-link {
+  }
+  
+  .auth-link {
     color: #bdbdbd;
     text-decoration: none;
     margin: 0 5px;
     transition: color 0.3s ease;
-}
-
-.auth-link:hover {
-    color: #14B8AE;
-}
-
-.auth-container {
+  }
+  
+  .auth-link:hover {
+    color: #14b8ae;
+  }
+  
+  .auth-container {
     max-width: 400px;
     margin: 50px auto;
     padding: 20px;
     background-color: #3d3d3d;
     border-radius: 10px;
     color: #bdbdbd;
-}
-
-.auth-title {
-    font-family: 'Numans', sans-serif;
+  }
+  
+  .auth-title {
+    font-family: "Numans", sans-serif;
     font-size: 2.5rem;
     margin-bottom: 20px;
     text-align: center;
-}
-
-.auth-form {
+  }
+  
+  .auth-form {
     display: flex;
     flex-direction: column;
-}
-
-.auth-form label {
+  }
+  
+  .auth-form label {
     margin-bottom: 5px;
     font-size: 1.2rem;
-}
-
-.auth-form input {
+  }
+  
+  .auth-form input {
     padding: 10px;
     margin-bottom: 15px;
     border: none;
     border-radius: 5px;
     font-size: 1rem;
-}
-
-.auth-button {
+  }
+  
+  .auth-button {
     padding: 10px;
-    background-color: #14B8AE;
+    background-color: #14b8ae;
     color: white;
     border: none;
     border-radius: 5px;
     font-size: 1.2rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-.auth-button:hover {
+  }
+  
+  .auth-button:hover {
     background-color: #0e807a;
-}
-
-.auth-switch {
+  }
+  
+  .auth-switch {
     text-align: center;
     margin-top: 10px;
-}
-
-.auth-switch .auth-link {
-    color: #14B8AE;
+  }
+  
+  .auth-switch .auth-link {
+    color: #14b8ae;
     text-decoration: none;
-}
-
-.auth-switch .auth-link:hover {
+  }
+  
+  .auth-switch .auth-link:hover {
     text-decoration: underline;
-}
-
-.edit-profile-btn {
+  }
+  
+  .edit-profile-btn {
     position: absolute;
     top: 20px;
     right: 20px;
     padding: 10px 20px;
-    background-color: #14B8AE;
+    background-color: #14b8ae;
     color: white;
     border: none;
     border-radius: 5px;
     font-size: 1.2rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-.edit-profile-btn:hover {
+  }
+  
+  .edit-profile-btn:hover {
     background-color: #0e807a;
-}
-
-.profile-edit-form {
+  }
+  
+  .profile-edit-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -349,68 +358,68 @@ body {
     padding: 20px;
     background-color: #3d3d3d;
     border-radius: 10px;
-}
-
-.form-group {
+  }
+  
+  .form-group {
     display: flex;
     flex-direction: column;
-}
-
-.form-label {
-    font-family: 'Numans', sans-serif;
+  }
+  
+  .form-label {
+    font-family: "Numans", sans-serif;
     font-size: 1.5rem;
     color: #bdbdbd;
     margin-bottom: 8px;
-}
-
-.form-input {
+  }
+  
+  .form-input {
     padding: 12px;
     font-size: 1.2rem;
     border: none;
     border-radius: 5px;
     background: #4a4a4a;
     color: #fff;
-}
-
-.save-btn {
+  }
+  
+  .save-btn {
     padding: 12px;
-    background-color: #14B8AE;
+    background-color: #14b8ae;
     color: white;
     border: none;
     border-radius: 5px;
     font-size: 1.2rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-.save-btn:hover {
+  }
+  
+  .save-btn:hover {
     background-color: #0e807a;
-}
-
-.remember-forgot {
+  }
+  
+  .remember-forgot {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin: 15px 0;
     font-size: 0.9em;
-}
-
-.remember-me {
+  }
+  
+  .remember-me {
     display: flex;
     align-items: center;
     position: relative;
     cursor: pointer;
-}
-
-.remember-me input {
+  }
+  
+  .remember-me input {
     position: absolute;
     opacity: 0;
     cursor: pointer;
     height: 0;
     width: 0;
-}
-
-.checkmark {
+  }
+  
+  .checkmark {
     display: inline-block;
     width: 18px;
     height: 18px;
@@ -419,18 +428,18 @@ body {
     border: 1px solid #ddd;
     border-radius: 3px;
     transition: all 0.3s;
-}
-
-.remember-me:hover input ~ .checkmark {
+  }
+  
+  .remember-me:hover input ~ .checkmark {
     background-color: #ccc;
-}
-
-.remember-me input:checked ~ .checkmark {
-    background-color: #2196F3;
-    border-color: #1976D2;
-}
-
-.checkmark:after {
+  }
+  
+  .remember-me input:checked ~ .checkmark {
+    background-color: #2196f3;
+    border-color: #1976d2;
+  }
+  
+  .checkmark:after {
     content: "";
     display: none;
     position: relative;
@@ -441,14 +450,14 @@ body {
     border: solid white;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
-}
-
-.remember-me input:checked ~ .checkmark:after {
+  }
+  
+  .remember-me input:checked ~ .checkmark:after {
     display: block;
-}
-
-/* Затемнение фона */
-.modal {
+  }
+  
+  /* Затемнение фона */
+  .modal {
     display: none; /* Скрыто по умолчанию */
     position: fixed;
     z-index: 1000;
@@ -460,64 +469,64 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* Контент модального окна */
-.modal-content {
+  }
+  
+  /* Контент модального окна */
+  .modal-content {
     background: #3d3d3d;
     padding: 20px;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     max-width: 400px;
-}
-
-.modal-content p {
-    font-family: 'Numans', sans-serif;
+  }
+  
+  .modal-content p {
+    font-family: "Numans", sans-serif;
     font-size: clamp(18px, 2.5vw, 25px);
     color: #989898;
     margin-bottom: 20px;
-}
-
-/* Кнопки */
-.modal-btn {
+  }
+  
+  /* Кнопки */
+  .modal-btn {
     margin: 10px;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-family: 'Numans', sans-serif;
+    font-family: "Numans", sans-serif;
     font-size: 1.2rem;
-}
-
-#confirm-logout {
-    background-color: #14B8AE;
+  }
+  
+  #confirm-logout {
+    background-color: #14b8ae;
     color: white;
-}
-
-#confirm-logout:hover {
+  }
+  
+  #confirm-logout:hover {
     background-color: #0e807a;
-}
-
-#cancel-logout {
+  }
+  
+  #cancel-logout {
     background-color: #656565;
     color: #bdbdbd;
-}
-
-#cancel-logout:hover {
+  }
+  
+  #cancel-logout:hover {
     background-color: #787878;
-}
-
-/* Generator page styles */
-.Generator-content {
+  }
+  
+  /* Generator page styles */
+  .Generator-content {
     width: 100%;
-}
-
-.Generator-content .Second-text {
+  }
+  
+  .Generator-content .Second-text {
     margin: 10px 0 0 20px;
-}
-
-.generator-form {
+  }
+  
+  .generator-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -526,57 +535,78 @@ body {
     padding: 20px;
     background-color: #3d3d3d;
     border-radius: 10px;
-}
-
-.form-group {
+  }
+  
+  .form-group {
     display: flex;
     flex-direction: column;
-}
-
-.form-label {
-    font-family: 'Numans', sans-serif;
+  }
+  
+  .form-label {
+    font-family: "Numans", sans-serif;
     font-size: 1.5rem;
     color: #bdbdbd;
     margin-bottom: 8px;
-}
-
-.form-input {
+  }
+  
+  .form-input {
     padding: 12px;
     font-size: 1.2rem;
     border: none;
     border-radius: 5px;
     background: #4a4a4a;
     color: #fff;
-}
-
-.generate-btn {
+  }
+  
+  .generate-btn {
     padding: 12px;
-    background-color: #14B8AE;
+    background-color: #14b8ae;
     color: white;
     border: none;
     border-radius: 5px;
     font-size: 1.2rem;
-    font-family: 'Numans', sans-serif;
+    font-family: "Numans", sans-serif;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-.generate-btn:hover {
+  }
+  
+  .generate-btn:hover {
     background-color: #0e807a;
-}
-
-.result-container {
+  }
+  
+  .result-container {
     margin: 20px 0 0 20px;
-}
-
-.generated-image {
-    max-width: 100%;
-    max-height: 400px;
-    border-radius: 10px;
-    margin-top: 15px;
-}
-
-#loading-text {
-    color: #14B8AE;
+    width: 95%;
+  }
+  
+  /* New styles for generated images */
+  .result-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+    width: 100%;
+  }
+  
+  .generated-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
+    background-color: #3d3d3d;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .generated-image:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  #loading-text {
+    color: #14b8ae;
     margin: 20px 0;
-}
+    font-family: "Numans", sans-serif;
+  }
+  
