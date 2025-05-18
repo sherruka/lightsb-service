@@ -359,7 +359,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    // Function to download all images
+    // Function to download all images as a ZIP archive
     async function downloadAllImages() {
       if (generatedImageUrls.length === 0) {
         alert("No images to download.")
@@ -367,30 +367,53 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Add a visual feedback that download is in progress
-      downloadAllBtn.textContent = "Downloading..."
+      downloadAllBtn.textContent = "Creating ZIP..."
       downloadAllBtn.disabled = true
 
       try {
-        // Download each image with a slight delay to prevent browser issues
-        for (let i = 0; i < generatedImageUrls.length; i++) {
-          const url = generatedImageUrls[i]
-          const filename = `generated-image-${i + 1}.png`
+        // Dynamically import JSZip
+        const JSZip = (await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm")).default
+        const zip = new JSZip()
 
-          // Add a small delay between downloads
-          await new Promise((resolve) => setTimeout(resolve, 300))
-          await downloadImage(url, filename)
-        }
+        // Create a folder in the zip
+        const imgFolder = zip.folder("generated-images")
+
+        // Add all images to the zip file
+        const fetchPromises = generatedImageUrls.map(async (url, index) => {
+          const response = await fetch(url)
+          const blob = await response.blob()
+          imgFolder.file(`generated-image-${index + 1}.png`, blob)
+        })
+
+        // Wait for all images to be fetched and added to the zip
+        await Promise.all(fetchPromises)
+
+        // Generate the zip file
+        const zipBlob = await zip.generateAsync({ type: "blob" })
+
+        // Create a download link for the zip file
+        const zipUrl = URL.createObjectURL(zipBlob)
+        const link = document.createElement("a")
+        link.href = zipUrl
+        link.download = "generated-images.zip"
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        // Clean up the object URL
+        setTimeout(() => URL.revokeObjectURL(zipUrl), 100)
 
         // Reset button state
         downloadAllBtn.innerHTML = '<span class="download-icon">↓</span> Download All'
         downloadAllBtn.disabled = false
       } catch (error) {
-        console.error("Error in download process:", error)
+        console.error("Error creating ZIP archive:", error)
         downloadAllBtn.innerHTML = '<span class="download-icon">↓</span> Download All'
         downloadAllBtn.disabled = false
-        alert("An error occurred during download. Please try again.")
+        alert("An error occurred while creating the ZIP file. Please try again.")
       }
     }
+
 
     // Add click event listener to download button
     if (downloadAllBtn) {
