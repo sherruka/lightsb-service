@@ -37,6 +37,9 @@ mkdir -p docker/nginx/ssl && openssl req -x509 -newkey rsa:2048 -keyout docker/n
 - **PgAdmin** (интерфейс для управления PostgreSQL базой данных) будет доступен на порту 15432 по адресу:
   - [http://localhost:15432](http://localhost:15432)
 
+- **Locust** (интерфейс нагрузочного тестирования) будет доступен на порту 8089 по адресу:
+  - [http://localhost:8089](http://localhost:8089)
+
 Убедитесь, что все порты свободны перед запуском.
 
 

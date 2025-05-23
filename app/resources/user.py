@@ -4,6 +4,7 @@ import os
 import shutil
 import tempfile
 from datetime import timedelta
+from decimal import Decimal
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse
 
@@ -252,7 +253,8 @@ def update_stats(
         stats_update.avg_usage_time = request.avg_usage_time
     else:
         stats_update.avg_usage_time = (
-            stats.avg_usage_time * stats.usage_count + request.avg_usage_time
+            stats.avg_usage_time * stats.usage_count
+            + Decimal(str(request.avg_usage_time))
         ) / (stats.usage_count + request.usage_count)
     stats_update.usage_count += request.usage_count
     stats_update.images_count += request.images_count
