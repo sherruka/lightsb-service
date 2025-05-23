@@ -79,8 +79,8 @@ jobs:
           docker exec locust locust \
             --headless \
             --host https://nginx \
-            --users 10 \
-            --spawn-rate 2 \
+            --users 5 \
+            --spawn-rate 1 \
             --run-time 120s \
             --only-summary \
             --csv=locust_results

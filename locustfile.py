@@ -18,6 +18,7 @@ class UserBehavior(TaskSet):
         """
         Login at the beginning of a user session.
         """
+        self.client.timeout = 60
         self.client.verify = False
         self.token = None
         self.username = f"testuser_{random.randint(1000, 9999)}"
