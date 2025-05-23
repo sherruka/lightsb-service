@@ -173,3 +173,4 @@ key.pem
 models/dataset_samples
 models/result
 models/LightSB/ALAE/training_artifacts/ffhq/model_157.pth
+app/static/generated
