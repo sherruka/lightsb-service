@@ -1,3 +1,5 @@
+from typing import Union
+
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
@@ -24,7 +26,7 @@ class UserStatsRepository:
         return new_stats
 
     @staticmethod
-    def get_user_stats(db: Session, user_id: str) -> UserStatsDB | None:
+    def get_user_stats(db: Session, user_id: str) -> Union[UserStatsDB, None]:
         # Получаем статистику пользователя по user_id
         return db.query(UserStatsDB).filter(UserStatsDB.user_id == user_id).first()
 

@@ -39,7 +39,7 @@ jobs:
           -subj "/C=RU/ST=Nizhny Novgorod Oblast/L=Nizhny Novgorod/O=Higher School of Economics NN/OU=/CN=localhost"
 
       - name: Build images
-        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.backend.yaml -f ./docker/docker-compose.nginx.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend up --build -d
+        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.nginx.yaml -f ./docker/docker-compose.postgres.yaml -f ./docker/docker-compose.locust.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend up --build -d
 
       - name: Check running containers
         run: docker ps -a
@@ -73,6 +73,20 @@ jobs:
             echo "Services failed to start"
             exit 1
           fi
+        
+      - name: Run Locust load test
+        run: |
+          docker exec locust locust \
+            --headless \
+            --host https://nginx \
+            --users 5 \
+            --spawn-rate 1 \
+            --run-time 120s \
+            --only-summary \
+            --csv=locust_results
+
+      - name: tests
+        run: docker exec fastapi pytest tests/test_user.py --disable-warnings --maxfail=1
 
       - name: Show logs if services fail
         if: failure() 
@@ -84,6 +98,7 @@ jobs:
           docker logs nginx || true
           docker logs pgadmin || true
           docker logs fastapi || true
+          docker logs locust || true
           
       - name: Stop and remove containers
-        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.backend.yaml -f ./docker/docker-compose.nginx.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend down
+        run: docker compose -f ./docker/docker-compose.minio.yaml -f ./docker/docker-compose.FastAPI.yaml -f ./docker/docker-compose.nginx.yaml -f ./docker/docker-compose.postgres.yaml -f ./docker/docker-compose.locust.yaml --env-file ./env/.env.minio --env-file ./env/.env.backend down

@@ -1,0 +1,15 @@
+services:
+  locust:
+    build:
+      context: ..
+      dockerfile: docker/locust/Dockerfile
+    container_name: locust
+    ports:
+      - "8089:8089"
+    volumes:
+      - ../locustfile.py:/locust/locustfile.py
+      - ../tests/load_images:/locust/tests/load_images
+    environment:
+      - LSB_IMG_DIR=tests/load_images
+    depends_on:
+      - fastapi

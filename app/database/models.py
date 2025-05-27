@@ -1,7 +1,16 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, Date, DateTime, ForeignKey, Integer, String
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Date,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+)
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -31,7 +40,7 @@ class UserStatsDB(Base):
     usage_count = Column(Integer, default=0)
     images_count = Column(Integer, default=0)
     last_used = Column(DateTime, nullable=True)
-    avg_usage_time = Column(Integer, nullable=True)
+    avg_usage_time = Column(Numeric(precision=10, scale=6), nullable=True)
 
     user = relationship("UserDB", back_populates="stats")
 
