@@ -16,7 +16,7 @@ def aging_pipeline(
 
     filenames = [os.path.abspath(filename) for filename in filenames]
     output_path = os.path.abspath(output_path)
-    checkpoint_path = f"{SCRIPT_PATH}/yolov11n_weights.pt"
+    checkpoint_path = f"{SCRIPT_PATH}/yolo11s_weights.pt"
 
     model = YOLO(checkpoint_path)
     hd_model = head_detector(model)
