@@ -1,4 +1,6 @@
 import cv2
+from importlib_resources.readers import remove_duplicates
+from ultralytics.utils.ops import non_max_suppression
 from ultralytics.utils.plotting import Annotator, colors
 
 
@@ -10,6 +12,9 @@ class head_detector:
     def __call__(self, images):
         return self.predict(images)
 
+    def remove_duplicates(self, results):
+        return non_max_suppression(results, conf_thres=0.4, iou_thres=0.5)[0]
+
     def predict(self, images) -> list:
         cropped_images = list()
         if not isinstance(images, list):
@@ -17,6 +22,7 @@ class head_detector:
         for image_path in images:
             image = cv2.imread(image_path)
             results = self.model(image)
+            results = remove_duplicates(results)
             idx = 0
             for i, result in enumerate(results):
                 annotator = Annotator(image, line_width=2, example=self.names)
